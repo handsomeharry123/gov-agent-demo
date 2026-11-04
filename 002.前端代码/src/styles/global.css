@@ -2491,24 +2491,30 @@ body[data-app-theme='tech'] ::-webkit-scrollbar-track { background: transparent;
 .gov-space-detail { padding: 16px; margin-top: 12px; border: 1px solid #dce8e3; border-radius: 10px; background: #f8fbfa; }
 .gov-content h3 { margin: 16px 0 10px; }
 
+/* Shared reading scale for chat and all four government scenarios. */
+.home-v1-message-list {
+  --conversation-font-size: 14px;
+  --conversation-line-height: 1.75;
+}
+
 /* Structured government answers */
 .gov-scenario-result{padding:0!important;border:0!important;background:transparent!important;overflow:visible}
 .gov-evidence{padding:0;margin:0;border:0;background:transparent;font-size:14px;color:#344054}
-.gov-progress{border:1px solid #e7e9ee;border-radius:12px;background:#f8f9fc;margin-bottom:14px;overflow:hidden}
-.gov-progress-toggle{display:flex;align-items:center;gap:12px;width:100%;padding:14px 18px;border:0;background:transparent;cursor:pointer;text-align:left;color:#667085;font:inherit}
-.gov-progress-toggle:hover{background:#f0f2f7}.gov-progress-toggle:focus-visible{outline:2px solid #bf5e73;outline-offset:-3px}
-.gov-status{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#f7e9ee;color:#b54863;flex-shrink:0}.gov-status.done{color:#398673;background:#e8f4ef}
-.gov-progress-label{flex:1;min-width:0}.gov-progress-label strong{color:#344054;font-size:14px}.gov-progress-label small{display:block;margin-top:3px;font-size:12px;color:#7b8494}.gov-progress-count{font-size:12px;font-variant-numeric:tabular-nums}
+.gov-progress{border:1px solid #e8e8e8;border-radius:12px;background:#ffffff;margin-bottom:14px;overflow:hidden}
+.gov-progress-toggle{display:flex;align-items:center;gap:12px;width:100%;padding:14px 18px;border:0;background:transparent;cursor:pointer;text-align:left;color:#737373;font:inherit}
+.gov-progress-toggle:hover{background:#fafafa}.gov-progress-toggle:focus-visible{outline:2px solid #bf5e73;outline-offset:-3px}
+.gov-status{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#f3f3f3;color:#626262;flex-shrink:0}.gov-status.done{color:#626262;background:#f3f3f3}
+.gov-progress-label{flex:1;min-width:0}.gov-progress-label strong{color:#303030;font-size:14px}.gov-progress-label small{display:block;margin-top:3px;font-size:12px;color:#737373}.gov-progress-count{font-size:12px;font-variant-numeric:tabular-nums}
 .gov-thinking-dots:not([hidden]){display:inline-block;animation:gov-pulse 1.4s ease-in-out infinite;margin-left:4px}
-.gov-evidence .gov-step-list{list-style:none;margin:0 18px 16px 33px;padding:0}.gov-step-list li{display:flex;gap:12px;position:relative;padding:9px 0;font-size:13px;line-height:1.7}.gov-step-list li:not(:last-child)::after{content:'';position:absolute;top:32px;bottom:-6px;left:10px;width:1px;background:#dde4e6}
-.gov-step-icon{display:grid;place-items:center;width:21px;height:21px;margin-top:1px;flex-shrink:0;border-radius:50%;background:#edf0f4;font-size:11px}.gov-step-list .complete{color:#548175}.gov-step-list .active{color:#b54863}.gov-step-list .pending{color:#98a2b3}
+.gov-evidence .gov-step-list{list-style:none;margin:0 18px 16px 33px;padding:0}.gov-step-list li{display:flex;gap:12px;position:relative;padding:9px 0;font-size:13px;line-height:1.7}.gov-step-list li:not(:last-child)::after{content:'';position:absolute;top:32px;bottom:-6px;left:10px;width:1px;background:#e5e5e5}
+.gov-step-icon{display:grid;place-items:center;width:21px;height:21px;margin-top:1px;flex-shrink:0;border-radius:50%;background:#f3f3f3;font-size:11px}.gov-step-list .complete{color:#626262}.gov-step-list .active{color:#303030;font-weight:500}.gov-step-list .active .gov-step-icon{color:#b54863}.gov-step-list .pending{color:#767676}
 .gov-answer{padding:24px;background:#fff;border:1px solid #e6e9ef;border-radius:14px}
-.gov-content{font-size:14px;line-height:1.85;color:#344054}.gov-content h3{margin:26px 0 14px;font-size:17px;font-weight:650;color:#202939;line-height:1.5}.gov-content h3:first-child{margin-top:0;font-size:20px}.gov-content h4{margin:22px 0 10px;font-size:15px;color:#202939}.gov-content p{margin:10px 0 16px}.gov-content ul,.gov-content ol{padding-left:22px;margin:12px 0 18px}.gov-content li{padding:4px 0}
+.gov-content{font-size:var(--conversation-font-size,14px);line-height:var(--conversation-line-height,1.75);color:#344054}.gov-content h3{margin:22px 0 10px;font-size:16px;font-weight:600;color:#202939;line-height:1.5}.gov-content h3:first-child{margin-top:0}.gov-content h4{margin:18px 0 8px;font-size:15px;font-weight:600;line-height:1.5;color:#202939}.gov-content p{margin:8px 0 12px}.gov-content ul,.gov-content ol{padding-left:22px;margin:10px 0 14px}.gov-content li{padding:2px 0}
 .gov-content table{min-width:560px;margin:6px 0 10px;border-radius:8px;overflow:hidden}.gov-content th{background:#f3f5f9!important;color:#475467;font-weight:600}.gov-content th,.gov-content td{padding:13px 14px!important;border:0!important;border-bottom:1px solid #eaecf0!important;line-height:1.75}.gov-content tbody tr:first-child{background:#fcf7f8}.gov-content tbody tr:hover{background:#f8f9fc}.gov-content td:first-child{font-weight:550;color:#253047}
 .gov-answer-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:22px;padding-top:18px;border-top:1px solid #edf0f3}.gov-answer-actions .ant-btn{height:34px;border-radius:7px;font-size:13px;box-shadow:none}
 .gov-evidence .gov-sources{border-top:1px solid #edf0f3;margin:18px 0 0;padding-top:14px}.gov-sources summary{font-size:12px;color:#667085;font-weight:500}.gov-sources summary>span{margin-left:8px;color:#98a2b3;font-weight:400}.gov-source-list{list-style:none;margin:0;padding:10px 0 0}.gov-source-list>li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #edf0f3;font-size:13px;min-width:0}.gov-source-list>li:last-child{border-bottom:0}.gov-source-id{flex-shrink:0;color:#b54863;font-weight:600}.gov-source-list a{color:#4c627e;overflow-wrap:anywhere}.gov-source-list a:hover{color:#b54863;text-decoration:underline}.gov-source-open{margin-left:auto;flex-shrink:0;font-size:12px}.gov-source-list>li>a:first-of-type{min-width:0}
 @keyframes gov-pulse{50%{opacity:.25}}
-@media(max-width:768px){.gov-answer{padding:16px}.gov-source-open{display:none}.gov-answer-actions{align-items:flex-start}.gov-content{font-size:13px}}
+@media(max-width:768px){.gov-answer{padding:16px}.gov-source-open{display:none}.gov-answer-actions{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.gov-thinking-dots,.gov-evidence .anticon-spin{animation:none!important}}
 
 /* 首页指标：轻量曲线与错峰入场，保留清晰的数据层级。 */

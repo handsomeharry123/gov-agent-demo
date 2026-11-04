@@ -4689,15 +4689,15 @@ const MessageBubble = ({
           </div>
         )}
         <div
-          className={msg.governmentScene ? 'gov-scenario-result' : undefined}
+          className={msg.governmentScene ? 'home-v1-message-content gov-scenario-result' : 'home-v1-message-content'}
           style={{
             background: isUser ? '#C8102E' : '#FFFFFF',
             color: isUser ? '#fff' : '#333',
             border: isUser ? 'none' : '1px solid #E5E7EB',
             borderRadius: 8,
             padding: '8px 12px',
-            fontSize: 12,
-            lineHeight: 1.6,
+            fontSize: 'var(--conversation-font-size)',
+            lineHeight: 'var(--conversation-line-height)',
             wordBreak: 'break-word',
             width: isWideAssistantContent ? '100%' : 'fit-content',
             maxWidth: shouldShowStandaloneMetrics ? '78%' : '100%',

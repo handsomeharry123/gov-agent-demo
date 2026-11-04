@@ -99,6 +99,6 @@ export function GovernmentContent({ content }: { content: string }) {
   return <div className="gov-content">{sections.map((part, index) => {
     if (!/^\n?\|/.test(part)) return <ReactMarkdown key={index}>{part}</ReactMarkdown>;
     const rows = part.trim().split('\n').map(row => row.trim().slice(1, -1).split('|').map(cell => cell.trim()));
-    return <div key={index} style={{overflowX:'auto', margin:'12px 0'}}><table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}><thead><tr>{rows[0].map((cell,i)=><th key={i} style={{padding:10,textAlign:'left',background:'#eef5f3',borderBottom:'1px solid #dce8e3'}}>{cell}</th>)}</tr></thead><tbody>{rows.slice(2).map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j} style={{padding:10,borderBottom:'1px solid #edf0ee',verticalAlign:'top'}}>{cell}</td>)}</tr>)}</tbody></table></div>;
+    return <div key={index} style={{overflowX:'auto', margin:'12px 0'}}><table style={{width:'100%',borderCollapse:'collapse',fontSize:'inherit'}}><thead><tr>{rows[0].map((cell,i)=><th key={i} style={{padding:10,textAlign:'left',background:'#eef5f3',borderBottom:'1px solid #dce8e3'}}>{cell}</th>)}</tr></thead><tbody>{rows.slice(2).map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j} style={{padding:10,borderBottom:'1px solid #edf0ee',verticalAlign:'top'}}>{cell}</td>)}</tr>)}</tbody></table></div>;
   })}</div>;
 }
