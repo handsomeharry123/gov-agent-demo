@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="32" fill="#C8102E"/>
+  <!-- π 顶横杠 -->
+  <rect x="15" y="17" width="34" height="7" fill="#fff"/>
+  <!-- π 左右两腿 -->
+  <rect x="20" y="17" width="7" height="32" fill="#fff"/>
+  <rect x="37" y="17" width="7" height="32" fill="#fff"/>
+  <!-- 底部衬线脚 -->
+  <rect x="15" y="45" width="17" height="6" fill="#fff"/>
+  <rect x="32" y="45" width="17" height="6" fill="#fff"/>
+</svg>
