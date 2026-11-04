@@ -70,6 +70,7 @@ import {
 } from 'antd';
 import type { UploadFile } from 'antd';
 import ReactMarkdown from 'react-markdown';
+import WorkspacePicker from '../../components/WorkspacePicker';
 import { skillPromptExamples, type SkillItem, type SkillKey } from '../../mock/skills';
 import { useAuth } from '../../hooks/useAuth';
 import { useDemoSettings } from '../../hooks/useDemoSettings';
@@ -4548,6 +4549,7 @@ ${ACCESS_SCENE.closing}`,
               </Space>
             </div>
           </div>
+          <WorkspacePicker />
         </div>
           </>
         )}
