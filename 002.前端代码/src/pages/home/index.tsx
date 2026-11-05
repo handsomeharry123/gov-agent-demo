@@ -1480,7 +1480,7 @@ const HomePage = ({ embedded = false, chatOnly = false, initialAssistantMessage,
 
   const visibleSceneTags: SceneTag[] = selectedAgent === 'industry'
     ? [{key:'industry-gap',label:'产业链缺口分析',prompt:'浦东新能源汽车产业链缺哪些关键环节？',icon:<AppstoreOutlined />}]
-    : governmentScenarios.filter(s => selectedAgent === 'general' || s.key === activeAgent.scene).map((scene, index) => ({ key: scene.key, label: scene.label, prompt: scene.example, icon: [<AppstoreOutlined />, <FileTextOutlined />, <DatabaseOutlined />, <SafetyCertificateOutlined />][index] }));
+    : governmentScenarios.filter(s => selectedAgent === 'general' || s.key === activeAgent.scene).map((scene, index) => ({ key: scene.key, label: scene.label, prompt: scene.example, icon: [<AppstoreOutlined />, <FileTextOutlined />, <DatabaseOutlined />, <SafetyCertificateOutlined />, <AppstoreOutlined />][index] }));
 
   const updateSceneTagScrollState = useCallback(() => {
     const el = sceneTagScrollRef.current;
@@ -3117,7 +3117,7 @@ ${ACCESS_SCENE.closing}`,
       setMessages(prev=>[...prev,userMsg,{id:`industry-${Date.now()}`,role:'assistant',content:industryContent,time:nowStr()}]);
       return;
     }
-    const detectedGovernmentScene = governmentScene ?? activeAgent.scene ?? ( /招商方案|一企一策|精密结构件/.test(text) ? 'gov-plan' : /空间|入驻|整层/.test(text) ? 'gov-space' : /政策|高新技术|研发投入/.test(text) ? 'gov-policy' : /研判|半导体封测/.test(text) ? 'gov-review' : null);
+    const detectedGovernmentScene = governmentScene ?? activeAgent.scene ?? ( /大屏|招商成效|招商情况|投屏/.test(text) ? 'gov-dashboard' : /招商方案|一企一策|精密结构件/.test(text) ? 'gov-plan' : /空间|入驻|整层/.test(text) ? 'gov-space' : /政策|高新技术|研发投入/.test(text) ? 'gov-policy' : /研判|半导体封测/.test(text) ? 'gov-review' : null);
     if (detectedGovernmentScene) {
       setGovernmentScene(detectedGovernmentScene);
       const scene = governmentScenarios.find(s => s.key === detectedGovernmentScene)!;
@@ -3129,11 +3129,11 @@ ${ACCESS_SCENE.closing}`,
       setMiddleView('overview');
       setIsNewTaskView(false);
       const content = governmentReply(detectedGovernmentScene, text);
-      if (currentUser) {
+      if (currentUser && detectedGovernmentScene !== 'gov-plan' && detectedGovernmentScene !== 'gov-dashboard' && !(detectedGovernmentScene === 'gov-policy' && /文件已生成/.test(content))) {
         try { archiveGeneratedFile(currentUser.id, currentUser.name, scene.label, content); }
         catch { message.warning('成果已生成，但本地归档失败，请及时导出保存'); }
       }
-      setMessages(prev => [...prev, userMsg, {id:`gov-a-${Date.now()}`, role:'assistant', content, governmentScene:detectedGovernmentScene, quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)), time:nowStr()}]);
+      setMessages(prev => [...prev, userMsg, {id:`gov-a-${Date.now()}`, role:'assistant', content, governmentScene:detectedGovernmentScene, quickActions:[...scene.actions], time:nowStr()}]);
       return;
     }
 

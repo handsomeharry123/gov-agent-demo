@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Button, Dropdown, Input, Space } from 'antd';
+import { Button, Dropdown, Space } from 'antd';
 import { CheckOutlined, LoadingOutlined, DownOutlined, EnvironmentOutlined, FileSearchOutlined, DownloadOutlined, MoreOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
+import GovernmentArtifacts from './GovernmentArtifacts';
 
 export const governmentScenarios = [
   { key: 'gov-space', label: '空间智能匹配', welcome: '您好！我是招商 AI 助手。请告诉我企业的行业类型、所需面积、人员规模，以及层高、独立门头、配电等特殊要求，我将匹配入驻空间和政策支持。', example: '有家做新能源汽车零部件的企业，想在浦东设华东研发中心，需要独立整层约 2000㎡，员工 80 人左右，对层高没有特殊要求。', steps: ['读取企业库 — 新能源汽车 · 零部件研发，浦东重点支持产业', '检索政策库 — 市级／区级／张江园区共命中 7 条', '筛选空间库 — 约 2000㎡整层空间共 23 处，核验硬约束', '综合评分排序 — 生成 Top 3 空间与政策清单'], actions: ['查看地图', '查看第一个空间楼层详情', '导出空间匹配方案'] },
-  { key: 'gov-plan', label: '招商方案生成', welcome: '您好！请提供企业名称或所属行业、拟投资规模、用地／用房需求。我将生成产业契合分析、空间推荐、政策包测算和风险提示，形成可编辑的一企一策方案。', example: '苏州有家做精密结构件的企业，想在长三角扩产，投资规模 1.5 亿，需要单层厂房约 2 万㎡，员工 300 人。帮我生成一份招商方案。', steps: ['调用企业库与产业链图谱，定位电池结构件环节', '本地缺口分析 — 电池结构件仅 2 家；符合硬约束厂房 4 处', '三级政策测算 — 3 年综合奖补约 1860 万元', '扫描合规、市场与竞争风险，生成一企一策'], actions: ['生成方案 A 申报材料清单', '编辑招商方案', '导出招商方案'] },
-  { key: 'gov-policy', label: '政策精准测算', welcome: '您好！请告诉我企业所属行业、注册地、规模（营收／员工数）和已有资质认定。我将匹配三级政策，测算奖补金额，并列出申报材料与叠加条件。', example: '我们是高新技术企业，去年营收 5000 万，研发投入 800 万，注册在张江园区。能享受哪些政策？大概能拿多少钱？', steps: ['读取企业画像，核验注册地与资质', '遍历市级 42 条、区级 67 条、园区 23 条政策', '匹配 11 条政策，核验叠加规则与上限', '生成测算表、来源与材料清单'], actions: ['生成申报材料清单', '如果注册地改到临港，政策有什么变化？', '导出政策测算表'] },
+  { key: 'gov-plan', label: '招商方案生成', welcome: '您好！请提供企业名称或所属行业、拟投资规模、用地／用房需求。我将生成产业契合分析、空间推荐、政策包测算和风险提示，形成可编辑的一企一策方案。', example: '苏州有家做精密结构件的企业，想在长三角扩产，投资规模 1.5 亿，需要单层厂房约 2 万㎡，员工 300 人。帮我生成一份招商方案。', steps: ['调用企业库与产业链图谱，定位电池结构件环节', '本地缺口分析 — 电池结构件仅 2 家；符合硬约束厂房 4 处', '三级政策测算 — 3 年综合奖补约 1860 万元', '扫描合规、市场与竞争风险，生成一企一策'], actions: ['把风险提示写详细一点，再补一章下一步推进建议', '预览招商报告'] },
+  { key: 'gov-policy', label: '政策精准测算', welcome: '您好！请告诉我企业所属行业、注册地、规模（营收／员工数）和已有资质认定。我将匹配三级政策，测算奖补金额，并列出申报材料与叠加条件。', example: '我们是高新技术企业，去年营收 5000 万，研发投入 800 万，注册在张江园区。能享受哪些政策？大概能拿多少钱？', steps: ['读取企业画像，核验注册地与资质', '遍历市级 42 条、区级 67 条、园区 23 条政策', '匹配 11 条政策，核验叠加规则与上限', '生成测算表、来源与材料清单'], actions: ['如果注册地改到临港，政策有什么变化？', '就按张江园区，把这 11 条政策的奖补测算和申报材料整理成文件'] },
   { key: 'gov-review', label: '项目快速研判', welcome: '您好！请提供企业名称（或所属行业）、拟投资规模和主要业务方向。我将展示尽调步骤，形成产业契合度、效益测算和风险等级的一页纸研判卡。', example: '刚收到一个项目意向，做半导体封测的，计划投资 3 亿，明天要给领导汇报。能帮我快速出一份研判卡吗？', steps: ['查询企业工商信息', '查询股权结构与实控人', '检索近 5 年专利与招投标记录', '扫描涉诉与失信记录', '匹配本地产业链缺口，生成一页纸研判卡'], actions: ['查看研判依据', '导出 PDF 研判卡'] },
+  { key: 'gov-dashboard', label: '招商成效统计', welcome: '您好！告诉我统计范围（时间／区域）与关注维度，我将汇总招商进展、空间去化和政策兑现，生成可全屏投屏的数据大屏，支持继续对话调整指标。', example: '帮我统计一下今年全区的招商情况，做成一个大屏，下周一汇报会上要投屏用。', steps: ['解析统计口径 — 2026-01-01 至 2026-11-05／浦东全区', '汇总企业库 — 签约项目、意向投资额与落地企业', '汇总空间库、政策库与系统日志，统一统计口径', '生成指标卡、园区地图、月度趋势与产业排行'], actions: ['再加一块空间闲置预警，把空置超过 90 天的载体列出来'] },
 ] as const;
 export type GovernmentSceneKey = typeof governmentScenarios[number]['key'];
 export const isGovernmentScene = (key: string): key is GovernmentSceneKey => governmentScenarios.some(s => s.key === key);
 
 type GovernmentSource = { id: string; name: string; href: string };
 const sourcesByScene: Record<GovernmentSceneKey, GovernmentSource[]> = {
+  'gov-dashboard': [{id:'S1',name:'招商综合态势统计底稿（2026-11-05，演示数据）',href:'/reference-materials/招商综合态势统计底稿.json'}],
   'gov-space': [
     {"id": "S1", "name": "浦东新能源汽车零部件产业链企业名录_2026年10月.txt", "href": "/reference-materials/浦东新能源汽车零部件产业链企业名录_2026年10月.txt"},
     {"id": "S2", "name": "浦东重点园区可租空间台账_2026年10月.csv", "href": "/reference-materials/浦东重点园区可租空间台账_2026年10月.csv"},
@@ -42,6 +45,9 @@ const sourcesByScene: Record<GovernmentSceneKey, GovernmentSource[]> = {
 
 const table = (heads: string[], rows: string[][]) => `\n\n| ${heads.join(' | ')} |\n| ${heads.map(() => '---').join(' | ')} |\n${rows.map(r => `| ${r.join(' | ')} |`).join('\n')}\n`;
 export function governmentReply(key: GovernmentSceneKey, question: string) {
+  if (key === 'gov-dashboard') return '### 2026 年浦东招商工作态势大屏' + (/闲置|90天|90 天|预警/.test(question) ? '（V2）\n已新增空间闲置预警：23 处载体，按空置时长排序，地图同步标红。可点击载体查看详情。' : '（V1）\n已生成四大模块：核心指标、园区分布、月度趋势和重点产业排行。支持全屏打开、投屏模式和对话调整指标。') + '\n\n新签约项目 126 个／意向投资额 386 亿元／落地企业 214 家／政策兑现 3.2 亿元。统计范围：2026-01-01 至 2026-11-05，浦东全区。数据来自企业库、空间库、政策库与系统日志的模拟汇总，并非真实招商业绩。[S1]';
+  if (key === 'gov-plan' && /风险.*详细|下一步推进|扩写/.test(question)) return governmentReply('gov-plan', '初稿').split('\n#### 四、')[0] + '\n\n### V2 更新记录\n已扩写风险提示，并新增下一步推进建议。其余章节保留，报告版本 V1 → V2。\n\n#### 四、风险提示（扩写）\n1. 合规风险：方案 B 排污指标余量不足；核验环评准入及排污许可。[S2]\n2. 合规风险：设备补助与租金补贴须核对叠加与不重复支持规则。[S3]\n3. 市场风险：精密结构件产能阶段性过剩，需验证订单覆盖与产能利用率。\n4. 市场风险：客户集中可能影响现金流，需补齐前五大客户与回款数据。\n5. 竞争风险：苏州、嘉兴方案需按同口径对比租金、补贴和搬迁成本，优劣尚待核验。\n6. 履约风险：资金来源和投产节点尚未证实，建议分阶段约定投资与政策兑现。\n\n#### 五、下一步推进建议\n- 本周：招商专员牵头完成 A 方案踏勘，园区核验配电、承重和交付。\n- 两周内：项目经理对接企业决策层，补齐设备清单、订单及资金证明。\n- 一个月内：法务与政策部门完成适用性审核，形成框架协议草案。\n\n新增风险为待验证事项，非已发生事实；来源沿用 [S2][S3][S4]。';
+  if (key === 'gov-policy' && /文件|清单|整理/.test(question)) return '### 张江园区政策申报文件已生成\n已锁定张江园区画像，不沿用临港对比参数。\n\n①《张江高新技术企业政策奖补测算表.xlsx》：11 条匹配记录，包含适用条件、公式、金额、窗口、叠加说明和来源；研发补贴 800×10%=80 万元，其余待核验条目不计入确定金额。\n\n②《张江高新技术企业政策申报材料清单.docx》：23 项材料，按主体、财务、项目、人才分组，并标注盖章与核验要求。\n\n210–280 万元为 PRD 演示初估区间，非可复算或承诺的奖补总额。[S3][S4]';
   if ((key === 'gov-plan' || key === 'gov-policy') && /材料/.test(question)) return `### 政策申报材料清单（11 项）\n适用范围：${key === 'gov-plan' ? '方案 A／临港项目' : '当前企业政策匹配'}。[S3]\n\n${['营业执照副本（盖章）', '近三年审计报告；不足三年提供现有年度', '项目投资计划与资金证明', '项目备案或核准文件', '场地租赁合同及产权证明', '设备采购合同、发票与付款凭证', '研发费用专项台账与辅助账', '高新技术／专精特新等资质证明', '人才劳动合同、社保与住房证明', '纳税及信用记录', '申报表、真实性承诺及不重复享受补贴说明'].map((s,i) => `${i+1}. ${s}`).join('\n')}\n\n材料要求为申报指引汇总，各政策应分别核对正式申报通知；不表示每项政策均要求全部材料。[S3]`;
   if (key === 'gov-review' && /依据/.test(question)) return '### 研判依据与取证清单\n1. 工商、股权与实控人：国家企业信用信息公示系统。[S1]\n2. 专利：知识产权局专利库，初步记录近三年 42 项。[S1]\n3. 产业链：本地封测覆盖率 23%，简报更新于 2026-10。[S3]\n4. 效益：年产值 8 亿元、税收 6000 万元、就业 350 人；奖补 2400 万元为初步测算。[S4]\n\n企业全称尚未提供，以上为项目初步记录；补充企业信息后可开展正式核验。';
   if (key === 'gov-space' && /楼层|详情|第一个/.test(question)) return '### 张江科学城 A 座 · 8 楼\n- 建筑面积：2100㎡；实用率约75%。[S2]\n- 精装交付、中央空调。[S2]\n- 配电200kVA，可扩容至400kVA（待园区确认）。[S2]\n- 车位21个，配比1:100㎡。[S2]\n- 食堂、人才公寓步行约5分钟。[S2]\n- 独立整层满足当前需求；承重、消防及实时空置状态待核验。[S2]';
@@ -55,39 +61,38 @@ export function governmentReply(key: GovernmentSceneKey, question: string) {
 export function GovernmentEvidence({ scene, content, onSkill }: { scene: GovernmentSceneKey; content: string; onSkill: () => void }) {
   const config = governmentScenarios.find(s => s.key === scene)!;
   const sources = sourcesByScene[scene];
+  const steps = scene === 'gov-policy' && /文件已生成/.test(content) ? ['锁定张江企业画像，不沿用临港参数', '整理 11 条匹配记录，校验公式与待补参数', '归集 23 项材料，标注原件与盖章要求', '生成 Excel 与 Word，保存至我的文件'] : scene === 'gov-plan' && /V2/.test(content) ? ['定位风险提示章节，保留其他章节', '扩写合规、市场、竞争与履约风险', '新增下一步推进建议，标注责任与时间', '生成报告 V2，同步预览与归档'] : scene === 'gov-dashboard' && /V2/.test(content) ? ['读取空间库，筛选空置超过 90 天的载体', '汇总 23 处预警，按空置时长排序', '新增预警模块，联动园区地图标色', '保存大屏 V2 快照'] : config.steps;
   const [step, setStep] = useState(0);
   const [expanded, setExpanded] = useState(true);
-  const ready = step === config.steps.length;
+  const ready = step === steps.length;
   const [mapOpen, setMapOpen] = useState(false);
   const [selected, setSelected] = useState(0);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [edit, setEdit] = useState(false);
   const [draft, setDraft] = useState(content);
-  useEffect(() => { setStep(0); setExpanded(true); setDraft(content); const timer = window.setInterval(() => setStep(v => { if (v + 1 >= config.steps.length) window.clearInterval(timer); return Math.min(v + 1, config.steps.length); }), 850); return () => clearInterval(timer); }, [scene, content, config.steps.length]);
+  useEffect(() => { setStep(0); setExpanded(true); setDraft(content); const timer = window.setInterval(() => setStep(v => { if (v + 1 >= steps.length) window.clearInterval(timer); return Math.min(v + 1, steps.length); }), 850); return () => clearInterval(timer); }, [scene, content, steps.length]);
   useEffect(() => { if (ready) setExpanded(false); }, [ready]);
   const download = () => { const url = URL.createObjectURL(new Blob([draft], {type:'text/markdown;charset=utf-8'})); const a=document.createElement('a'); a.href=url; a.download=`${config.label}-方案.md`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
   const print = () => { const w=window.open('', '_blank'); if (!w) return; const pre=w.document.createElement('pre'); pre.textContent=draft; pre.style.cssText='white-space:pre-wrap;font:14px/1.8 sans-serif;padding:24px'; w.document.title=config.label+''; w.document.body.append(pre); w.print(); };
-  return <div className="gov-evidence" data-ready={step === config.steps.length}>
+  return <div className="gov-evidence" data-ready={step === steps.length}>
     <div className="gov-progress" aria-busy={!ready}>
       <button className="gov-progress-toggle" onClick={() => setExpanded(v => !v)} aria-expanded={expanded}>
         <span className={ready ? 'gov-status done' : 'gov-status'}>{ready ? <CheckOutlined /> : <LoadingOutlined spin />}</span>
-        <span className="gov-progress-label"><strong>{ready ? '分析已完成' : '正在分析您的需求'}<span className="gov-thinking-dots" hidden={ready}>···</span></strong><small aria-live="polite">{ready ? `已完成 ${config.steps.length} 个处理步骤` : config.steps[step]?.split(' — ')[0]}</small></span>
-        <span className="gov-progress-count">{step}/{config.steps.length}</span><DownOutlined rotate={expanded ? 180 : 0} />
+        <span className="gov-progress-label"><strong>{ready ? '分析已完成' : '正在分析您的需求'}<span className="gov-thinking-dots" hidden={ready}>···</span></strong><small aria-live="polite">{ready ? `已完成 ${steps.length} 个处理步骤` : steps[step]?.split(' — ')[0]}</small></span>
+        <span className="gov-progress-count">{step}/{steps.length}</span><DownOutlined rotate={expanded ? 180 : 0} />
       </button>
-      {expanded && <ol className="gov-step-list">{config.steps.map((s,i) => <li key={s} className={i < step ? 'complete' : i === step ? 'active' : 'pending'}><span className="gov-step-icon">{i < step ? <CheckOutlined /> : i === step ? <LoadingOutlined spin /> : i + 1}</span><span>{s}</span></li>)}</ol>}
+      {expanded && <ol className="gov-step-list">{steps.map((s,i) => <li key={s} className={i < step ? 'complete' : i === step ? 'active' : 'pending'}><span className="gov-step-icon">{i < step ? <CheckOutlined /> : i === step ? <LoadingOutlined spin /> : i + 1}</span><span>{s}</span></li>)}</ol>}
     </div>
-    {ready && <div className="gov-answer"><GovernmentContent content={draft} />
+    {ready && <div className="gov-answer"><GovernmentContent content={scene === 'gov-plan' ? (/V2/.test(draft) ? '### 招商报告已更新 · V2\n已扩写风险提示并新增下一步推进建议。可在报告中查看更新章节、继续编辑并导出。' : '### 一企一策招商报告已生成\n已完成产业契合分析、三套空间比选、政策包测算与风险提示。打开章节预览，可继续对话修改报告。') : draft} /><GovernmentArtifacts scene={scene} content={draft} onContentChange={setDraft} />
       <div className="gov-answer-actions">
         <Space wrap size={8}>
           {scene === 'gov-space' && <><Button type="primary" icon={<FileSearchOutlined />} onClick={() => setDetailOpen(v => !v)} aria-expanded={detailOpen}>{detailOpen ? '收起楼层详情' : '查看推荐空间详情'}</Button><Button icon={<EnvironmentOutlined />} onClick={() => setMapOpen(v => !v)} aria-expanded={mapOpen}>{mapOpen ? '收起地图' : '查看地图'}</Button></>}
-          {scene === 'gov-plan' && <Button type="primary" onClick={() => setEdit(v => !v)}>{edit ? '收起编辑' : '编辑招商方案'}</Button>}
+
         </Space>
         <Space size={8}><Dropdown menu={{ items: [{key:'md', label:'导出 Markdown', onClick:download}, {key:'pdf', label:'打印 / 另存为 PDF', onClick:print}] }} trigger={['click']}><Button icon={<DownloadOutlined />}>导出结果 <DownOutlined /></Button></Dropdown><Dropdown menu={{items:[{key:'skill',label:'技能中心',onClick:onSkill}]}} trigger={['click']}><Button aria-label="更多操作" icon={<MoreOutlined />} /></Dropdown></Space>
       </div>
       <details className="gov-sources" open><summary>引用材料 <span>{sources.length} 份材料</span></summary><ul className="gov-source-list">{sources.map(s => <li key={s.id}><span className="gov-source-id">{s.id}</span><a href={s.href} target="_blank" rel="noopener noreferrer">{s.name}</a><a className="gov-source-open" href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`打开${s.name}`}>查看材料 ↗</a></li>)}</ul></details>
     </div>}
     {detailOpen && <div className="gov-space-detail"><GovernmentContent content={governmentReply('gov-space', '第一个空间楼层详情')} /><small>来源：园区空间库 · 台账更新时间 2026-10-28 [S2]</small></div>}
-    {edit && <div><Input.TextArea value={draft} onChange={e=>setDraft(e.target.value)} rows={10}/><Button onClick={()=>setEdit(false)}>保存修改</Button><p>修改保存在当前卡片，导出采用修改后的内容。</p></div>}
     {mapOpen && <div className="gov-space-map"><p>浦东空间选址示意图 · 非导航地图／点位非精确坐标</p><svg viewBox="0 0 360 190" role="img" aria-label="张江、金桥、外高桥空间点位示意"><rect width="360" height="190" rx="12" fill="#f0f6f5"/><path d="M25 0 Q110 90 45 190" stroke="#bbdce6" strokeWidth="24" fill="none"/><path d="M100 0L280 190M80 120L360 60M160 0L160 190" stroke="white" strokeWidth="8"/>{[['张江科学城 A 座',220,144],['金桥产业园3号楼',190,83],['外高桥科创园B栋',255,32]].map(([label,x,y],i)=><g key={label} onClick={()=>setSelected(i)} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')setSelected(i);}} aria-label={`选择${label}`} style={{cursor:'pointer'}}><circle cx={x} cy={y} r={selected===i?10:7} fill={selected===i?'#2468D8':'#719d93'}/><text x={Number(x)+13} y={Number(y)+4} fontSize="10" fill="#344054">{label}</text></g>)}</svg><p>{['张江 A 座 · 8F · 2100㎡ · 5.2元/㎡/天','金桥3号楼 · 5F · 1980㎡ · 4.8元/㎡/天','外高桥B栋 · 3F · 2050㎡ · 4.5元/㎡/天'][selected]} [S2]</p></div>}
   </div>;
 }

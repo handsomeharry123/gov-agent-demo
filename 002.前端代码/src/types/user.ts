@@ -17,6 +17,8 @@ export type SyncStatus = 'success' | 'partial' | 'failed';
 export interface User {
   id: string;
   name: string;
+  /** 面向用户展示的姓名或账号名称，独立于登录标识。 */
+  displayName?: string;
   /** 工号：从医院系统同步，唯一标识 */
   employeeId: string;
   /** 所属组织（科室） */

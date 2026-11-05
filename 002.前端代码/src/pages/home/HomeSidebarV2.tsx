@@ -232,16 +232,16 @@ export const initialSessions: SessionEntry[] = [
 
 export const sessionHistoryMocks: Record<string, ChatMessage[]> = { ...investmentHistories };
 { const scene = governmentScenarios.find(s => s.key === 'gov-plan')!;
-  sessionHistoryMocks.s1 = [{id:'s1-u1',role:'user',content:scene.example,time:"刚刚"},{id:'s1-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"刚刚"}]; }
+  sessionHistoryMocks.s1 = [{id:'s1-u1',role:'user',content:scene.example,time:"刚刚"},{id:'s1-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:[...scene.actions],time:"刚刚"}]; }
 { const scene = governmentScenarios.find(s => s.key === 'gov-space')!;
-  sessionHistoryMocks.s2 = [{id:'s2-u1',role:'user',content:scene.example,time:"刚刚"},{id:'s2-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"刚刚"}]; }
+  sessionHistoryMocks.s2 = [{id:'s2-u1',role:'user',content:scene.example,time:"刚刚"},{id:'s2-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:[...scene.actions],time:"刚刚"}]; }
 { const scene = governmentScenarios.find(s => s.key === 'gov-space')!;
-  sessionHistoryMocks.s3 = [{id:'s3-u1',role:'user',content:scene.example,time:"22 分钟前"},{id:'s3-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"22 分钟前"}]; }
+  sessionHistoryMocks.s3 = [{id:'s3-u1',role:'user',content:scene.example,time:"22 分钟前"},{id:'s3-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:[...scene.actions],time:"22 分钟前"}]; }
 sessionHistoryMocks.s4 = [{"id": "s4-u1", "role": "user", "content": "浦东新能源汽车产业链缺口分析", "time": "今早 09:12"}, {"id": "s4-a1", "role": "assistant", "content": "新能源汽车产业链覆盖：电池材料12家、电池结构件2家、BMS 5家、电机/电控8家、整车制造1家、充换电设备3家。优先补链电池结构件与整车制造，重点强链BMS与充换电设备。来源：产业链图谱、企业库（PRD演示数据）。", "time": "今早 09:12"}];
 { const scene = governmentScenarios.find(s => s.key === 'gov-policy')!;
-  sessionHistoryMocks.s5 = [{id:'s5-u1',role:'user',content:scene.example,time:"昨日 16:40"},{id:'s5-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"昨日 16:40"}]; }
+  sessionHistoryMocks.s5 = [{id:'s5-u1',role:'user',content:scene.example,time:"昨日 16:40"},{id:'s5-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:[...scene.actions],time:"昨日 16:40"}]; }
 { const scene = governmentScenarios.find(s => s.key === 'gov-review')!;
-  sessionHistoryMocks.s6 = [{id:'s6-u1',role:'user',content:scene.example,time:"上周"},{id:'s6-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"上周"}]; }
+  sessionHistoryMocks.s6 = [{id:'s6-u1',role:'user',content:scene.example,time:"上周"},{id:'s6-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:[...scene.actions],time:"上周"}]; }
 sessionHistoryMocks.s7 = [{"id": "s7-u1", "role": "user", "content": "本月招商进展汇总报告生成", "time": "上周"}, {"id": "s7-a1", "role": "assistant", "content": "本月招商进展汇总报告（草稿）\n\n在库目标企业12,847家，本月服务企业186家，空间闲置预警23处。报告包含企业接洽、空间匹配、政策测算与重点项目研判；建议优先跟进半导体封测项目，协调精密结构件扩产项目现场踏勘。\n\n来源：企业库、空间库、系统对话日志（演示数据）。", "time": "上周"}];
 
 

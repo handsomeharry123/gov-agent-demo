@@ -1,3 +1,4 @@
+import { getUserDisplayName } from '../utils/userDisplayName';
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Dropdown, Avatar, Space, message, Typography, Layout } from 'antd';
@@ -112,7 +113,7 @@ const BasicLayout = () => {
           >
             <UserOutlined style={{ color: governmentBlue.primary }} />
             <Text style={{ fontSize: 13, color: governmentBlue.primary, fontWeight: 500 }}>
-              {currentUser?.name ?? '-'}
+              {getUserDisplayName(currentUser)}
             </Text>
           </div>
           <Dropdown

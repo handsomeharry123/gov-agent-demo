@@ -1,4 +1,5 @@
-export interface KnowledgeFile { id: string; title: string; category: string; date: string; publisher: string; content: string; source?: string; personal?: boolean }
+import { getUserDisplayName } from '../../utils/userDisplayName';
+export interface KnowledgeFile { id: string; title: string; category: string; date: string; publisher: string; content: string; source?: string; personal?: boolean; format?: 'docx' | 'xlsx' }
 const groups = [
   { category: '政策服务', publisher: '浦东新区企业服务中心', titles: ['高新技术企业认定申报材料准备指南', '研发费用加计扣除办理常见问题', '专精特新中小企业申报条件核验清单', '科技型中小企业评价入库操作指南', '张江园区企业政策匹配工作指引', '企业技术改造项目申报材料清单', '人才安居政策咨询与材料准备指南', '市区两级财政扶持重复申报核验指引', '集成电路企业政策适配服务手册', '生物医药研发项目政策咨询问答', '临港新片区企业政策服务办事指引', '年度惠企政策申报日历编制说明'] },
   { category: '空间服务', publisher: '浦东产业空间服务专班', titles: ['张江科学城研发办公载体资源清单', '金桥产业园标准厂房选址服务指南', '外高桥保税区域仓储空间需求采集表', '临港装备制造厂房入驻核验清单', '新能源汽车研发中心选址需求模板', '生物医药中试载体准入咨询指南', '集成电路洁净厂房配套条件核查表', '产业用房层高承重与配电踏勘记录表', '产业园区租赁意向与合同材料清单', '企业跨区搬迁与入驻服务流程', '存量厂房更新改造需求对接指南', '楼宇整层租赁现场踏勘工作手册'] },
@@ -9,11 +10,11 @@ export const publicKnowledgeFiles: KnowledgeFile[] = groups.flatMap((group, g) =
 const key = (userId: string) => `gov-knowledge-files-v1:${userId}`;
 export function readPersonalFiles(userId: string): KnowledgeFile[] { try { const raw = localStorage.getItem(key(userId)); if (raw === null) return personalDemoFiles(); const data = JSON.parse(raw); return Array.isArray(data) ? data.filter(f => f && typeof f.id === 'string' && typeof f.content === 'string') : []; } catch { return []; } }
 export function writePersonalFiles(userId: string, files: KnowledgeFile[]) { localStorage.setItem(key(userId), JSON.stringify(files)); window.dispatchEvent(new Event('knowledge-files-updated')); }
-export function archiveGeneratedFile(userId: string, publisher: string, title: string, content: string) { const files = readPersonalFiles(userId); writePersonalFiles(userId, [{ id: `generated-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `${title}.md`, category: '我的文件', date: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }), publisher, content, source: '智能体生成', personal: true }, ...files]); }
+export function archiveGeneratedFile(userId: string, publisher: string, title: string, content: string) { const files = readPersonalFiles(userId); writePersonalFiles(userId, [{ id: `generated-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: `${title}.md`, category: '我的文件', date: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }), publisher: getUserDisplayName({ name: publisher }), content, source: '智能体生成', personal: true }, ...files]); }
 
 function personalDemoFiles(): KnowledgeFile[] {
   const titles = ['苏州精密结构件企业一企一策招商方案', '新能源汽车研发中心空间匹配方案', '张江高新技术企业政策测算表', '半导体封测项目初步研判卡', '本月招商项目推进情况汇总报告', '医疗器械中试厂房准入核验清单', '机器人核心零部件补链建议', '金桥存量厂房招商线索匹配清单', '集成电路设计企业申报材料清单', '外高桥仓储项目现场踏勘提纲', '生物医药研发中心选址对比报告', '重点企业走访问题与跟进计划'];
-  return titles.map((title, i) => ({ id: `demo-personal-${i}`, title: `${title}.md`, category: '我的文件', date: `2026-${i < 5 ? '11' : '10'}-${String(i < 5 ? 5 - i : 31 - i).padStart(2, '0')}`, publisher: '我（智能体协助生成）', personal: true, source: '智能体生成 · 示例成果', content: `# ${title}
+  return titles.map((title, i) => ({ id: `demo-personal-${i}`, title: `${title}.md`, category: '我的文件', date: `2026-${i < 5 ? '11' : '10'}-${String(i < 5 ? 5 - i : 31 - i).padStart(2, '0')}`, publisher: '我', personal: true, source: '智能体生成 · 示例成果', content: `# ${title}
 
 > 当前账号的演示成果，业务信息为模拟数据。
 

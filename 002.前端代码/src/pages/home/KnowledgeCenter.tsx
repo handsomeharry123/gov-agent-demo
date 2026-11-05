@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Button, Empty, Input, Modal, Popconfirm, Space, Table, Tabs, Tag, Typography, message } from 'antd';
 import { FileTextOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
+import { exportArtifact } from './artifactExport';
+import { getUserDisplayName } from '../../utils/userDisplayName';
 import { useAuth } from '../../hooks/useAuth';
 import { publicKnowledgeFiles, readPersonalFiles, writePersonalFiles, type KnowledgeFile } from './knowledgeFiles';
 const categories = ['全部', '我的文件', '政策服务', '空间服务', '企业服务', '产业服务'];
@@ -14,7 +16,8 @@ export default function KnowledgeCenter({ onAsk }: { onAsk: (prompt: string) => 
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<KnowledgeFile | null>(null);
   useEffect(() => { const refresh = () => { setPersonal(userId ? readPersonalFiles(userId) : []); setSelected(null); }; refresh(); window.addEventListener('knowledge-files-updated', refresh); window.addEventListener('storage', refresh); return () => { window.removeEventListener('knowledge-files-updated', refresh); window.removeEventListener('storage', refresh); }; }, [userId]);
-  const all = [...publicKnowledgeFiles, ...personal].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+  const publisherName = getUserDisplayName(currentUser);
+  const all = [...publicKnowledgeFiles, ...personal.map(file => ({ ...file, publisher: publisherName }))].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
   const filtered = all.filter(f => (category === '全部' || f.category === category) && `${f.title} ${f.publisher} ${f.content}`.toLowerCase().includes(keyword.trim().toLowerCase()));
   const remove = (file: KnowledgeFile) => { if (!userId || !file.personal) return; try { writePersonalFiles(userId, readPersonalFiles(userId).filter(f => f.id !== file.id)); setPage(p => Math.min(p, Math.max(1, Math.ceil((filtered.length - 1) / 10)))); message.success('文件已删除'); } catch { message.error('删除失败，请重试'); } };
   return <section className="knowledge-center" data-testid="home-v1-middle-knowledge">
@@ -30,6 +33,6 @@ export default function KnowledgeCenter({ onAsk }: { onAsk: (prompt: string) => 
       { title: '发布人', dataIndex: 'publisher', width: 220 },
       { title: '操作', key: 'actions', width: 120, render: (_, file) => <Space><Button type="link" size="small" onClick={() => setSelected(file)}>查看</Button>{file.personal && <Popconfirm title="确认删除这份文件？" description="删除后无法恢复，请确认已保留需要的内容。" okText="删除" cancelText="取消" okButtonProps={{ danger: true }} onConfirm={() => remove(file)}><Button danger type="link" size="small">删除</Button></Popconfirm>}</Space> },
     ]} />
-    <Modal title={selected?.title} open={!!selected} onCancel={() => setSelected(null)} width={860} footer={<Button type="primary" onClick={() => { if (selected) onAsk(`请基于《${selected.title}》协助我处理业务。以下是文件内容：\n${selected.content}`); setSelected(null); }}>基于此文件提问</Button>}><Typography.Paragraph type="secondary">{selected?.publisher} · {selected?.date} · {selected?.source}</Typography.Paragraph><div style={{ maxHeight: '60vh', overflowY: 'auto', lineHeight: 1.9 }}><ReactMarkdown>{selected?.content || ''}</ReactMarkdown></div></Modal>
+    <Modal title={selected?.title} open={!!selected} onCancel={() => setSelected(null)} width={860} footer={<Space>{selected?.format && <Button onClick={() => { if(selected?.format) exportArtifact(selected.title,selected.content,selected.format).catch(()=>message.error('下载失败，请重试')); }}>下载文件</Button>}<Button type="primary" onClick={() => { if (selected) onAsk(`请基于《${selected.title}》协助我处理业务。以下是文件内容：\n${selected.content}`); setSelected(null); }}>基于此文件提问</Button></Space>}><Typography.Paragraph type="secondary">{selected?.publisher} · {selected?.date} · {selected?.source}</Typography.Paragraph><div style={{ maxHeight: '60vh', overflowY: 'auto', lineHeight: 1.9 }}><ReactMarkdown>{selected?.content || ''}</ReactMarkdown></div></Modal>
   </section>;
 }
