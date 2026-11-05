@@ -3,7 +3,7 @@ import { Modal } from 'antd';
 import { AppstoreOutlined, BankOutlined, CheckOutlined, DownOutlined, EnvironmentOutlined, FileTextOutlined, PartitionOutlined } from '@ant-design/icons';
 
 export const agents = [
-  { key: 'general', name: '综合智能体', short: '招小慧', description: '政策 · 空间 · 产业 · 招引 · 研判 · 决策，一句话就能办', icon: <AppstoreOutlined />, color: '#bf5e73', scene: null },
+  { key: 'general', name: '综合智能体', short: '招小慧', description: '政策 · 空间 · 产业 · 招引 · 研判 · 决策，一句话就能办', icon: <AppstoreOutlined />, color: '#2468D8', scene: null },
   { key: 'space', name: '空间智能体', short: '空间智能体', description: '入驻匹配、载体选址与楼宇空间分析', icon: <EnvironmentOutlined />, color: '#5e8e86', scene: 'gov-space' },
   { key: 'policy', name: '政策智能体', short: '政策智能体', description: '政策匹配、奖补测算与申报材料清单', icon: <FileTextOutlined />, color: '#ad8956', scene: 'gov-policy' },
   { key: 'industry', name: '产业智能体', short: '产业智能体', description: '产业链分析、缺口识别与强链补链建议', icon: <PartitionOutlined />, color: '#7384ad', scene: null },

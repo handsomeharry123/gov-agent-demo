@@ -1,3 +1,4 @@
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 import {
   BookOutlined,
   CalendarOutlined,
@@ -11,7 +12,6 @@ import {
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import { Card, Col, Row, Typography } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import HomeSidebarV2 from './HomeSidebarV2';
 import { autoTaskTemplates } from './autoTaskTemplates';
 
@@ -32,8 +32,8 @@ const templateIcons = [
   HeartOutlined,
 ];
 
-const AutoTaskTemplateList = () => {
-  const navigate = useNavigate();
+const AutoTaskTemplateList = ({ embedded = false }: { embedded?: boolean }) => {
+  const navigate = useWorkspaceNavigate();
 
   return (
     <div
@@ -41,7 +41,7 @@ const AutoTaskTemplateList = () => {
       style={{
         padding: 16,
         background: '#F0F2F5',
-        height: 'calc(100dvh - 64px)',
+        height: embedded ? '100%' : 'calc(100dvh - 64px)',
         minHeight: 0,
         boxSizing: 'border-box',
         overflow: 'hidden',

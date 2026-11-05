@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Dropdown, Avatar, Space, message, Typography, Layout } from 'antd';
 import { DesktopOutlined, LogoutOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../hooks/useAuth';
+import { governmentBlue } from '../theme/brand';
 
 const { Text } = Typography;
 const { Header, Content } = Layout;
@@ -36,6 +37,7 @@ const BasicLayout = () => {
   }, [demoViewport]);
 
   const userMenuItems: MenuProps['items'] = [
+    { key: 'official-website', label: '浦易达官网' },
     {
       key: 'switch-viewport',
       icon: demoViewport === 'pc' ? <MobileOutlined /> : <DesktopOutlined />,
@@ -46,11 +48,12 @@ const BasicLayout = () => {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: '退出登录',
-      danger: true,
+      style: { color: governmentBlue.primary },
     },
   ];
 
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'official-website') { navigate('/website/pud'); return; }
     if (key === 'switch-viewport') {
       setDemoViewport((current) => (current === 'pc' ? 'mobile' : 'pc'));
       message.success(demoViewport === 'pc' ? '已切换至移动端 Demo' : '已切换至 PC 端 Demo');
@@ -81,28 +84,18 @@ const BasicLayout = () => {
           boxShadow: '0 1px 10px rgba(31, 41, 55, 0.025)',
         }}
       >
-        <div
+        <Link
+          to="/app/home/overview"
+          aria-label="浦易达首页"
           className="app-demo-brand"
-          style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
-          onClick={() => navigate('/app/home/overview')}
+          style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, textDecoration: 'none' }}
         >
           <img
             src="/gov-logo.svg"
-            alt="政务综合智能体"
-            style={{ width: 34, height: 34, display: 'block' }}
+            alt="浦易达"
+            className="app-demo-brand-logo"
           />
-          <span
-            className="app-demo-brand-name"
-            style={{
-              fontSize: 17,
-              fontWeight: 600,
-              color: '#A93E52',
-              letterSpacing: 1,
-            }}
-          >
-            政务综合智能体
-          </span>
-        </div>
+        </Link>
         <Space className="app-demo-account" size={16} align="center">
           <div
             className="app-demo-user-pill"
@@ -112,13 +105,13 @@ const BasicLayout = () => {
               gap: 8,
               padding: '4px 10px',
               borderRadius: 16,
-              background: '#F8F9FB',
-              border: '1px solid #E7EAF0',
+              background: governmentBlue.surface,
+              border: `1px solid ${governmentBlue.border}`,
               cursor: 'default',
             }}
           >
-            <UserOutlined style={{ color: '#7C8798' }} />
-            <Text style={{ fontSize: 13, color: '#4B5565', fontWeight: 500 }}>
+            <UserOutlined style={{ color: governmentBlue.primary }} />
+            <Text style={{ fontSize: 13, color: governmentBlue.primary, fontWeight: 500 }}>
               {currentUser?.name ?? '-'}
             </Text>
           </div>
@@ -127,15 +120,16 @@ const BasicLayout = () => {
             placement="bottomRight"
             trigger={['click']}
           >
-            <Avatar
-              className="app-demo-user-avatar"
-              style={{
-                background: 'linear-gradient(145deg, #E98292, #CB536A)',
-                boxShadow: '0 5px 14px rgba(180, 67, 88, 0.16)',
-                cursor: 'pointer',
-              }}
-              icon={<UserOutlined />}
-            />
+            <button type="button" className="app-demo-account-trigger" aria-label="打开账户菜单">
+              <Avatar
+                className="app-demo-user-avatar"
+                style={{
+                  background: governmentBlue.primary,
+                  boxShadow: '0 5px 14px rgba(36, 104, 216, 0.16)',
+                }}
+                icon={<UserOutlined />}
+              />
+            </button>
           </Dropdown>
         </Space>
       </Header>

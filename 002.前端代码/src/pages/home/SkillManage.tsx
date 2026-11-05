@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Empty, Row, Space, Switch, Tag, Tooltip, Typography } from 'antd';
 import { useSkillState } from './useSkillState';
@@ -6,7 +6,7 @@ import { useSkillState } from './useSkillState';
 const { Text, Title } = Typography;
 
 const SkillManage = ({ embedded = false }: { embedded?: boolean } = {}) => {
-  const navigate = useNavigate();
+  const navigate = useWorkspaceNavigate();
   const { installedSkills, setSkillEnabled } = useSkillState();
 
   return (

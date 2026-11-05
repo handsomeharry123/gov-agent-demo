@@ -1,3 +1,4 @@
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 /**
  * 首页 V1.x · 自动化任务「新建」表单子页
  *
@@ -16,7 +17,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import {
   type FormProps,
@@ -83,8 +84,8 @@ const formatNextRunIn = (values: {
   return formatDiff(next);
 };
 
-const AutoTaskForm = () => {
-  const navigate = useNavigate();
+const AutoTaskForm = ({ embedded = false }: { embedded?: boolean }) => {
+  const navigate = useWorkspaceNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const templateId =
@@ -214,7 +215,7 @@ const AutoTaskForm = () => {
       style={{
         padding: 16,
         background: '#F0F2F5',
-        height: 'calc(100dvh - 64px)',
+        height: embedded ? '100%' : 'calc(100dvh - 64px)',
         minHeight: 0,
         boxSizing: 'border-box',
         overflow: 'hidden',

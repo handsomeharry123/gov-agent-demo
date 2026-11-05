@@ -1,3 +1,7 @@
+import { investmentSessions, investmentHistories } from './investmentSessionMocks';
+import { ReadOutlined } from '@ant-design/icons';
+import { PUDONG_BLUE } from '../../theme/brand';
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 /**
  * 招小慧智能体首页 V1.x · 第二层 · 首页内左侧管理栏
  *
@@ -9,9 +13,8 @@
  *   - 所有 data-testid 命名 home-v1-side-*,不影响 verify_home_v1.mjs 黑名单断言。
  *   - 文案避开黑名单:1.3 「新建任务」(≠「新建对话」)、1.4 「自动化任务记录」(≠「自动化任务执行」)、1.5 「历史会话」(≠「最近对话」)。
  */
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import {
   ApiOutlined,
   CaretDownOutlined,
@@ -34,6 +37,7 @@ import {
 } from 'antd';
 import { governmentScenarios, governmentReply, type GovernmentSceneKey } from './governmentScenarios';
 import AgentRobotIcon from '../agent-center/smart/AgentRobotIcon';
+import { WorkspaceSidebarContext } from '../../hooks/WorkspaceSidebarContext';
 import { toggleSiderCollapsed } from '../../hooks/useSiderCollapsed';
 
 const { Text } = Typography;
@@ -216,16 +220,17 @@ export const initialSessions: SessionEntry[] = [
   {
     "id": "s6",
     "title": "半导体封测项目落地研判",
-    "updatedAt": "上周"
+    "updatedAt": "昨日 18:10"
   },
   {
     "id": "s7",
     "title": "本月招商进展汇总报告生成",
-    "updatedAt": "上周"
-  }
+    "updatedAt": "昨日 17:30"
+  },
+  ...investmentSessions,
 ];
 
-export const sessionHistoryMocks: Record<string, ChatMessage[]> = {};
+export const sessionHistoryMocks: Record<string, ChatMessage[]> = { ...investmentHistories };
 { const scene = governmentScenarios.find(s => s.key === 'gov-plan')!;
   sessionHistoryMocks.s1 = [{id:'s1-u1',role:'user',content:scene.example,time:"刚刚"},{id:'s1-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"刚刚"}]; }
 { const scene = governmentScenarios.find(s => s.key === 'gov-space')!;
@@ -238,6 +243,26 @@ sessionHistoryMocks.s4 = [{"id": "s4-u1", "role": "user", "content": "浦东新�
 { const scene = governmentScenarios.find(s => s.key === 'gov-review')!;
   sessionHistoryMocks.s6 = [{id:'s6-u1',role:'user',content:scene.example,time:"上周"},{id:'s6-a1',role:'assistant',content:governmentReply(scene.key,scene.example),governmentScene:scene.key,quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)),time:"上周"}]; }
 sessionHistoryMocks.s7 = [{"id": "s7-u1", "role": "user", "content": "本月招商进展汇总报告生成", "time": "上周"}, {"id": "s7-a1", "role": "assistant", "content": "本月招商进展汇总报告（草稿）\n\n在库目标企业12,847家，本月服务企业186家，空间闲置预警23处。报告包含企业接洽、空间匹配、政策测算与重点项目研判；建议优先跟进半导体封测项目，协调精密结构件扩产项目现场踏勘。\n\n来源：企业库、空间库、系统对话日志（演示数据）。", "time": "上周"}];
+
+
+// 原有场景也保留后续沟通，历史详情呈现业务推进过程。
+const existingFollowups: Record<string, [string, string]> = {
+  s1: ['方案拿去谈判之前，哪些内容必须先确认？', '优先确认设备投资构成、拟注册主体、厂房交付和政策适用条件。三年奖补合计仅为演示初估，参数不全时不应作为对外承诺；建议输出待核验清单，由招商专员、园区和企业逐项确认后更新方案。'],
+  s2: ['先比较前两个载体，除了租金还要重点看什么？', '重点比较用途及准入、实用面积、配电扩容、交付时间、装修成本、通勤配套与提前退租条款。约看前先确认实时可租状态，再核对企业设备清单；推荐排名属于初筛，不能替代现场核验。'],
+  s3: ['企业补充有冲压设备，希望下周安排现场踏勘，提前准备哪些材料？', '请企业提供设备尺寸、最大点荷载、振动参数、峰值用电及工艺说明；园区准备结构图、消防验收、供电及交付资料。建议先对临港候选厂房开展工程核验，再确定踏勘时间。目前仅整理准备事项，未实际预约。'],
+  s4: ['下一阶段招商先聚焦哪个环节？不要只按企业数量判断。', '建议将电池结构件列为优先核验方向，同时补充本地采购需求、现有产能、技术门槛和目标企业扩产意愿。企业数量少只能提示线索，不能直接推导市场缺口；先访谈需求方，再形成补链名单和接洽次序。'],
+  s5: ['企业还没落户，能把最高补贴写进意向书吗？', '建议写为“符合条件后协助申报，具体以有效政策及主管部门审核为准”。注册、资质、投入认定、申报窗口和同类补助限制需逐项核对，最高额度不能直接当作企业可得金额。先收集主体信息和投资明细，再复算政策包。'],
+  s6: ['领导关心能不能落，给一个明确的阶段性判断。', '阶段性判断：有条件推进，尚不具备确认落地条件。企业需补充工艺、用能与排放数据，园区核实准入和基础设施；同步核验投资来源、客户订单及建设排期。关键约束未核清前，不建议作出供地或奖补承诺。'],
+  s7: ['报告给例会用，补上风险和下周行动，注意别把服务企业数写成签约数。', '### 例会补充：风险与下一步\n\n- **统计口径**：本月服务企业186家为对话日志按企业去重的服务量，不代表新增线索、签约或落地数量；在库12,847家为存量规模。\n- **空间风险**：23处为可租且超过90天未更新的台账预警，先回访核实状态，再统计实际空置面积。\n- **精密结构件**：招商专员会同园区工程人员核实设备基础和供电，具备条件后协调踏勘。\n- **半导体封测**：补齐工艺、用能及排放资料，完成准入预沟通后更新研判结论。\n- **政策测算**：核对设备投入基数、主体资格及重复补助限制，不把初估奖补作为承诺。\n\n以上为报告草稿及建议分工，未实际派发任务。来源：企业库、空间库及对话日志（演示数据）。'],
+};
+Object.entries(existingFollowups).forEach(([id, [question, answer]]) => {
+  const time = initialSessions.find(s => s.id === id)!.updatedAt;
+  sessionHistoryMocks[id] = sessionHistoryMocks[id].map(message => ({ ...message, time }));
+  sessionHistoryMocks[id].push(
+    { id: `${id}-u2`, role: 'user', content: question, time },
+    { id: `${id}-a2`, role: 'assistant', content: `${answer}\n\n本会话为业务演示，相关参数及建议待核验。`, time },
+  );
+});
 
 export const buildRunHistoryMock = (task: AutoTask, run: AutoTaskSubRun): ChatMessage[] => [
   {
@@ -345,7 +370,7 @@ const HighlightRow = ({
         marginLeft: -8,
         width: 'calc(100% + 16px)',
         borderRadius: 6,
-        background: active ? '#FFF7F7' : 'transparent',
+        background: active ? '#F0F6FF' : 'transparent',
         cursor: 'pointer',
         transition: 'all 0.15s',
         display: 'flex',
@@ -370,17 +395,17 @@ const HighlightRow = ({
             bottom: 4,
             width: 3,
             borderRadius: 2,
-            background: '#DA6679',
+            background: '#4083E8',
           }}
         />
       )}
       {icon ? (
-        <span style={{ color: active ? '#C65369' : '#667085', fontSize: 12, flexShrink: 0 }}>{icon}</span>
+        <span style={{ color: active ? '#2468D8' : '#667085', fontSize: 12, flexShrink: 0 }}>{icon}</span>
       ) : null}
       <span
         style={{
           fontSize: 13,
-          color: active ? '#B7445A' : '#344054',
+          color: active ? '#1854B7' : '#344054',
           fontWeight: active ? 500 : 400,
           flex: 1,
           minWidth: 0,
@@ -441,13 +466,14 @@ interface Props {
   onRestoreSession: (id: string) => void;
   onRestoreRun: (id: string) => void;
   /** 独立子页可指定进入时的工作台高亮项。 */
-  initialActiveKey?: 'new' | 'connector' | 'skill' | 'auto-task';
+  initialActiveKey?: 'new' | 'connector' | 'skill' | 'auto-task' | 'knowledge';
   /** 新建自动化任务成功 → 同步在右侧对话区推一条「任务创建成功」气泡 */
   onAutoTaskCreated?: (task: AutoTask, firstRunName: string) => void;
   /** 点 sidebar「连接器」→ 切换首页中间内容区(不跳路由) */
   onOpenConnector?: () => void;
   /** 点 sidebar「技能」→ 切换首页中间内容区(不跳路由) */
   onOpenSkill?: () => void;
+  onOpenKnowledge?: () => void;
   /** 点 sidebar「自动化任务」→ 切换首页中间内容区(不跳路由) */
   onOpenAutoTasks?: () => void;
   /** 与中间自动化列表共享的任务数据，确保测试运行记录实时同步到侧栏 */
@@ -462,8 +488,9 @@ interface Props {
   newReplySessionIds?: Set<string>;
 }
 
-const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiveKey = 'new', onAutoTaskCreated, onOpenConnector, onOpenSkill, onOpenAutoTasks, autoTasks = initialAutoTasks, sessions: sessionsProp, activeSessionId, generatingSessionId, newReplySessionIds }: Props) => {
-  const navigate = useNavigate();
+const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiveKey = 'new', onAutoTaskCreated, onOpenConnector, onOpenSkill, onOpenKnowledge, onOpenAutoTasks, autoTasks = initialAutoTasks, sessions: sessionsProp, activeSessionId, generatingSessionId, newReplySessionIds }: Props) => {
+  const navigate = useWorkspaceNavigate();
+  const collapseWorkspace = useContext(WorkspaceSidebarContext);
   const sessions = sessionsProp ?? initialSessions;
 
   /* Drawer:搜索对话 */
@@ -481,7 +508,8 @@ const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiv
   /* 1.1 工具区:收起 / 搜索 */
   const handleCollapse = () => {
     // 联动全局 ProLayout 折叠状态:点击后左侧 7 菜单立刻收起/展开
-    toggleSiderCollapsed();
+    if (collapseWorkspace) collapseWorkspace();
+    else toggleSiderCollapsed();
   };
   const handleSearch = () => {
     setSearchOpen(true);
@@ -537,6 +565,7 @@ const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiv
                 size="small"
                 icon={<MenuFoldOutlined />}
                 onClick={handleCollapse}
+                aria-label="收起工作台侧栏"
                 data-testid="home-v1-side-tools-collapse"
               />
             </Tooltip>
@@ -564,22 +593,7 @@ const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiv
               testId="home-v1-side-workbench-new"
               icon={<PlusOutlined />}
             >
-              新建任务
-            </HighlightRow>
-            <HighlightRow
-              active={activeKey === 'connector'}
-              onClick={() => {
-                setActiveKey('connector');
-                if (onOpenConnector) {
-                  onOpenConnector();
-                } else {
-                  navigate('/app/home/connector');
-                }
-              }}
-              testId="home-v1-side-workbench-connector"
-              icon={<ApiOutlined />}
-            >
-              连接器
+              新对话
             </HighlightRow>
             <HighlightRow
               active={activeKey === 'skill'}
@@ -594,23 +608,18 @@ const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiv
               testId="home-v1-side-workbench-skill"
               icon={<ToolOutlined />}
             >
-              技能
+              技能中心
             </HighlightRow>
             <HighlightRow
-              active={activeKey === 'auto-task'}
+              active={activeKey === 'knowledge'}
               onClick={() => {
-                setActiveKey('auto-task');
-                if (onOpenAutoTasks) {
-                  onOpenAutoTasks();
-                } else {
-                  navigate('/app/home/auto-tasks/new');
-                }
+                setActiveKey('knowledge');
+                if (onOpenKnowledge) onOpenKnowledge();
+                else navigate('/app/home/knowledge');
               }}
-              testId="home-v1-side-workbench-auto"
-              icon={<ClockCircleOutlined />}
-            >
-              自动化任务
-            </HighlightRow>
+              testId="home-v1-side-workbench-knowledge"
+              icon={<ReadOutlined />}
+            >知识中心</HighlightRow>
           </div>
         </div>
 
@@ -672,7 +681,7 @@ const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiv
                           style={{
                             display: 'block',
                             fontSize: 12,
-                            color: isActive ? '#C8102E' : '#333',
+                            color: isActive ? PUDONG_BLUE : '#333',
                             fontWeight: isActive ? 500 : 400,
                             flex: 1,
                             minWidth: 0,
@@ -689,117 +698,7 @@ const HomeSidebarV2 = ({ onNewTask, onRestoreSession, onRestoreRun, initialActiv
             )}
           </div>
 
-          {/* 1.5 自动化任务记录(一级分组可折叠 + 二级子任务) */}
-          <div data-testid="home-v1-side-tasks">
-            <div style={{ marginBottom: 6 }}>
-              <SectionTitle
-                count={autoTasks.length}
-                open={tasksExpanded}
-                onToggle={() => setTasksExpanded((v) => !v)}
-              >
-                自动化任务记录
-              </SectionTitle>
-            </div>
-            {tasksExpanded && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {autoTasks.map((t) => {
-                  const isOpen = taskGroupOpen[t.id] ?? true;
-                  const taskKey = `task-${t.id}`;
-                  const isTaskActive = activeKey === taskKey;
-                  return (
-                    <div
-                      key={t.id}
-                      data-testid={`home-v1-side-task-${t.id}`}
-                      style={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-                    >
-                      {/* 一级:任务名称(可折叠 + 选中高亮) */}
-                      <HighlightRow
-                        active={isTaskActive}
-                        onClick={() => {
-                          setActiveKey(taskKey);
-                          setTaskGroupOpen((prev) => ({ ...prev, [t.id]: !isOpen }));
-                        }}
-                        testId={`home-v1-side-task-row-${t.id}`}
-                        icon={
-                          isOpen ? (
-                            <CaretDownOutlined style={{ fontSize: 10, color: isTaskActive ? '#C8102E' : '#8c8c8c' }} />
-                          ) : (
-                            <CaretRightOutlined style={{ fontSize: 10, color: isTaskActive ? '#C8102E' : '#8c8c8c' }} />
-                          )
-                        }
-                      >
-                        <Text
-                          ellipsis
-                          style={{
-                            fontSize: 12,
-                            color: isTaskActive ? '#C8102E' : '#595959',
-                            fontWeight: 500,
-                            flex: 1,
-                            minWidth: 0,
-                          }}
-                        >
-                          {t.name}
-                        </Text>
-                      </HighlightRow>
-                      {/* 二级:子任务执行记录 */}
-                      {isOpen && (
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 2,
-                            paddingLeft: 8,
-                          }}
-                        >
-                          {t.runs.map((r) => {
-                            const runKey = `run-${r.id}`;
-                            const isRunActive = activeKey === runKey;
-                            return (
-                              <HighlightRow
-                                key={r.id}
-                                level={1}
-                                active={isRunActive}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveKey(runKey);
-                                  onRestoreRun(r.id);
-                                }}
-                                testId={`home-v1-side-task-run-${r.id}`}
-                              >
-                                <span
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    width: '100%',
-                                    minWidth: 0,
-                                    gap: 6,
-                                  }}
-                                >
-                                  <Text
-                                    ellipsis
-                                    style={{
-                                      display: 'block',
-                                      fontSize: 11,
-                                      color: isRunActive ? '#C8102E' : '#595959',
-                                      flex: 1,
-                                      minWidth: 0,
-                                    }}
-                                  >
-                                    {r.name}
-                                  </Text>
-                                  <ActivityIndicator status={r.activityStatus} fallback={r.updatedAt} />
-                                </span>
-                              </HighlightRow>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+
         </div>
 
         {/* 1.6 账户区已下线(顶部已有角色徽标) */}

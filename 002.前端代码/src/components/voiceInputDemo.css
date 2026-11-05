@@ -1,0 +1,51 @@
+.voice-demo-modal .ant-modal-content{border:1px solid #e4edff;border-radius:24px;padding:24px;background:linear-gradient(155deg,#f1f6ff,#fff 55%);box-shadow:0 24px 80px #16387726}.voice-demo-content{text-align:center;padding-top:8px}.voice-demo-wave{height:118px;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:14px}.voice-demo-wave i{width:4px;border-radius:8px;background:linear-gradient(#8abaff,#2468e8);animation:voice-demo-wave 1s ease-in-out infinite alternate;transform-origin:center}.voice-demo-state{color:#2468d8;font-size:15px;font-weight:600}.voice-demo-transcript{min-height:108px;margin:20px 0 12px;padding:18px;text-align:left;background:#ffffffd9;border:1px solid #e4ebf6;border-radius:14px;font-size:17px;line-height:1.9;color:#25364b}.voice-demo-placeholder{color:#9aa6b8;font-size:15px}.voice-demo-caret{display:inline-block;width:2px;height:18px;background:#347aef;vertical-align:middle;margin-left:3px;animation:voice-demo-caret 1s steps(2) infinite}@keyframes voice-demo-wave{from{transform:scaleY(.25);opacity:.5}to{transform:scaleY(1);opacity:1}}@keyframes voice-demo-caret{to{opacity:0}}@media(prefers-reduced-motion:reduce){.voice-demo-wave i,.voice-demo-caret{animation:none}}
+
+/* Let the title share the dialog's continuous gradient surface. */
+.voice-demo-modal .ant-modal-header {
+  background: transparent;
+}
+
+.voice-demo-wave.is-silent i{animation:none;transform:scaleY(.12);opacity:.45;transition:transform .5s,opacity .5s}.voice-demo-transcript{margin-bottom:0}
+
+/* Align the portal with both the mobile preview and real phone screens. */
+body[data-demo-viewport='mobile'] .voice-demo-overlay {
+  --voice-page-inset: max(0px, calc((100vw - 430px) / 2));
+}
+.voice-demo-overlay .ant-modal-mask,
+.voice-demo-overlay .ant-modal-wrap {
+  left: var(--voice-page-inset, 0px);
+  right: var(--voice-page-inset, 0px);
+}
+.voice-demo-overlay .ant-modal-wrap {
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+.voice-demo-overlay .voice-demo-modal {
+  max-width: 100%;
+  margin: 0 auto;
+  padding-bottom: 0;
+}
+.voice-demo-modal .ant-modal-content {
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.voice-demo-transcript {
+  max-height: min(32dvh, 240px);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+.voice-demo-wave { max-width: 100%; }
+.voice-demo-wave i { flex: 0 1 4px; min-width: 0; }
+body[data-demo-viewport='mobile'] .voice-demo-modal .ant-modal-content {
+  padding: 20px;
+  border-radius: 20px;
+}
+@media (max-width: 480px) {
+  .voice-demo-modal .ant-modal-content { padding: 20px; border-radius: 20px; }
+}
+@media (max-height: 600px) {
+  .voice-demo-wave { height: 80px; margin-top: 0; }
+  .voice-demo-transcript { min-height: 80px; margin-top: 12px; padding: 14px; }
+}

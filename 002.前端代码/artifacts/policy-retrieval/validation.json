@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-05",
+  "levels": {
+    "district": 400,
+    "city": 224,
+    "national": 74
+  },
+  "districtTechnologyCategory": 66,
+  "cityCommerceDepartment": 39,
+  "mobileOverflow": false,
+  "pageErrors": [],
+  "checks": [
+    "官网入口跳转",
+    "三级政策切换",
+    "部门筛选",
+    "分类筛选",
+    "搜索后重置分页",
+    "分页",
+    "收藏持久化",
+    "政策抽屉",
+    "金额追问与关键限制",
+    "Esc关闭",
+    "移动端390px抽屉",
+    "官网AI入口",
+    "原独立AI路由"
+  ]
+}

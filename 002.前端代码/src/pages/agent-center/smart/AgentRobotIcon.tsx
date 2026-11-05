@@ -80,8 +80,8 @@ const RobotIcon = ({ mood = 'idle', size = 64, badge, badgePulse = false, handWa
             <stop offset="100%" stopColor="#E7EAF0" />
           </linearGradient>
           <linearGradient id={`agent-blue-grad-${instanceId}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#E86B7D" />
-            <stop offset="100%" stopColor="#C53F58" />
+            <stop offset="0%" stopColor="#69A6F5" />
+            <stop offset="100%" stopColor="#2468D8" />
           </linearGradient>
           <radialGradient id={`agent-face-grad-${instanceId}`} cx="42%" cy="28%" r="85%">
             <stop offset="0%" stopColor="#3A3F4A" />
@@ -93,8 +93,8 @@ const RobotIcon = ({ mood = 'idle', size = 64, badge, badgePulse = false, handWa
             <stop offset="100%" stopColor="#FFB454" />
           </linearGradient>
           <radialGradient id={`agent-soft-glow-${instanceId}`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#F7AAB4" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#D8576B" stopOpacity="0" />
+            <stop offset="0%" stopColor="#A9CEF9" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#2468D8" stopOpacity="0" />
           </radialGradient>
         </defs>
 
@@ -121,7 +121,7 @@ const RobotIcon = ({ mood = 'idle', size = 64, badge, badgePulse = false, handWa
                C 56 14 53 12 50 13
                C 46 14 45 17 45 20"
             fill="none"
-            stroke="#D8576B"
+            stroke="#2468D8"
             strokeWidth="5.5"
             strokeLinecap="round"
           />
@@ -157,7 +157,7 @@ const RobotIcon = ({ mood = 'idle', size = 64, badge, badgePulse = false, handWa
             fill={`url(#agent-blue-grad-${instanceId})`}
           />
           <path d="M 35 70 Q 48 76 61 70" fill="none" stroke="#FFFFFF" strokeWidth="2.2" opacity="0.85" />
-          <circle cx="48" cy="77" r="3.1" fill="#D8576B" />
+          <circle cx="48" cy="77" r="3.1" fill="#2468D8" />
           <circle cx="47" cy="75.8" r="1.1" fill="#FFFFFF" opacity="0.7" />
         </g>
 
@@ -249,8 +249,8 @@ const RobotIcon = ({ mood = 'idle', size = 64, badge, badgePulse = false, handWa
             </g>
           )}
 
-          <circle cx="31" cy="44" r="1.8" fill="#F19999" opacity="0.75" />
-          <circle cx="65" cy="44" r="1.8" fill="#F19999" opacity="0.75" />
+          <circle cx="31" cy="44" r="1.8" fill="#A5C9F5" opacity="0.75" />
+          <circle cx="65" cy="44" r="1.8" fill="#A5C9F5" opacity="0.75" />
         </g>
       </svg>
 

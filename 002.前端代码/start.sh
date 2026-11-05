@@ -11,7 +11,7 @@ PORT=3001
 # 只有返回本项目的页面，才能认定服务已经启动。
 # 不覆盖其他占用端口的服务（例如 Docker 转发的 BISHENG）。
 while lsof -iTCP:"$PORT" -sTCP:LISTEN -P -n >/dev/null 2>&1; do
-  if curl -fsS "http://localhost:$PORT/" 2>/dev/null | grep -q '<title>政务综合智能体</title>'; then
+  if curl -fsS "http://localhost:$PORT/" 2>/dev/null | grep -q '<title>浦易达</title>'; then
     echo "✓ 项目已在 http://localhost:$PORT/ 运行"
     exit 0
   fi
@@ -34,7 +34,7 @@ echo "等待启动..."
 # 最多 15s 等待监听
 for i in $(seq 1 15); do
   sleep 1
-  if curl -fsS "http://localhost:$PORT/" 2>/dev/null | grep -q '<title>政务综合智能体</title>'; then
+  if curl -fsS "http://localhost:$PORT/" 2>/dev/null | grep -q '<title>浦易达</title>'; then
     echo
     echo "✓ 项目已在 http://localhost:$PORT/ 运行 (用时 ${i}s)"
     echo "日志: tail -f $LOG_FILE"

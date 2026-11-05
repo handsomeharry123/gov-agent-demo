@@ -1,5 +1,6 @@
+import { PUDONG_BLUE } from '../../theme/brand';
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   CheckSquareOutlined,
   CloseOutlined,
@@ -37,7 +38,7 @@ type SkillListProps = {
 };
 
 const SkillList = ({ embedded = false, onTrySkill }: SkillListProps = {}) => {
-  const navigate = useNavigate();
+  const navigate = useWorkspaceNavigate();
   const { skills, installedSkills, installSkill, closeSkill, uninstallSkill } = useSkillState();
   const [keyword, setKeyword] = useState('');
   const [importOpen, setImportOpen] = useState(false);
@@ -91,7 +92,7 @@ const SkillList = ({ embedded = false, onTrySkill }: SkillListProps = {}) => {
         style={embedded ? { padding: '14px 18px' } : undefined}
         title={
           <Space size={embedded ? 8 : 10}>
-            <ToolOutlined style={{ color: '#C8102E' }} />
+            <ToolOutlined style={{ color: PUDONG_BLUE }} />
             <span>技能</span>
           </Space>
         }

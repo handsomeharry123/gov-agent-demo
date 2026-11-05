@@ -1,3 +1,4 @@
+import { PUDONG_BLUE } from '../../theme/brand';
 /**
  * 首页 V1.x · 连接器列表页
  *
@@ -128,7 +129,7 @@ const ConnectorList = ({ embedded = false }: { embedded?: boolean } = {}) => {
         style={embedded ? { padding: '14px 18px' } : undefined}
         title={
           <Space size={embedded ? 8 : 10}>
-            <ApiOutlined style={{ color: '#C8102E' }} />
+            <ApiOutlined style={{ color: PUDONG_BLUE }} />
             <span>连接器</span>
           </Space>
         }

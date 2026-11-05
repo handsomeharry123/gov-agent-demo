@@ -1,275 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tabs, Form, Input, Button, Card, Typography, Checkbox, message, Space } from 'antd';
-import { UserOutlined, LockOutlined, MobileOutlined, SafetyOutlined } from '@ant-design/icons';
-import type { FormProps } from 'antd';
-import { mockUsers } from '../../mock/users';
+import { useAuth } from '../../hooks/useAuth';
+import { Alert, Button, Card, Form, Input, Modal, Select, Space, Tabs, Typography, message } from 'antd';
+import { LockOutlined, QrcodeOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import './login.css';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
+const OFFICIAL_LOGIN = 'https://zwdtuser.sh.gov.cn/uc/login/login.jsp';
 
-interface AccountLoginValues {
-  account: string;
-  password: string;
-  captcha?: string;
-  remember?: boolean;
-}
-
-interface PhoneLoginValues {
-  phone: string;
-  verificationCode: string;
-}
-
-const Login = () => {
-  const navigate = useNavigate();
+export default function Login() {
   const [form] = Form.useForm();
-  const [phoneForm] = Form.useForm();
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [countdown, setCountdown] = useState(0);
-  const [activeTab, setActiveTab] = useState('account');
-  const [errorCount, setErrorCount] = useState(0);
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const [captcha, setCaptcha] = useState('');
-  const [lockUntil, setLockUntil] = useState<number | null>(null);
-  const [lockRemaining, setLockRemaining] = useState(0);
-
-  const generateCaptcha = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let result = '';
-    for (let i = 0; i < 4; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setCaptcha(result);
-  };
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
-
-  useEffect(() => {
-    if (lockUntil) {
-      const interval = setInterval(() => {
-        const remaining = Math.max(0, Math.ceil((lockUntil - Date.now()) / 1000));
-        setLockRemaining(remaining);
-        if (remaining === 0) {
-          setLockUntil(null);
-          setErrorCount(0);
-        }
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [lockUntil]);
-
-  useEffect(() => {
-    if (errorCount >= 3) {
-      setShowCaptcha(true);
-      generateCaptcha();
-    }
-  }, [errorCount]);
-
-  const handleSendCode = async () => {
-    const phone = phoneForm.getFieldValue('phone');
-    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
-      message.error('请输入正确的手机号');
-      return;
-    }
-    setCountdown(60);
-    message.success('验证码已发送');
-  };
-
-  const handleAccountLogin: FormProps<AccountLoginValues>['onFinish'] = async (values) => {
-    if (lockUntil && Date.now() < lockUntil) {
-      message.error(`账号已锁定，请 ${lockRemaining} 秒后再试`);
-      return;
-    }
-
-    if (showCaptcha && values.captcha?.toUpperCase() !== captcha) {
-      message.error('图形验证码错误');
-      generateCaptcha();
-      return;
-    }
-
+  const handleLogin = async (values: { account: string; password: string }) => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-
-    const user = mockUsers.find(
-      (u) =>
-        (u.employeeId === values.account || u.phone === values.account || u.name === values.account) &&
-        u.password === values.password
-    );
-
-    if (user) {
-      message.success('登录成功');
-      navigate('/app/home/overview', { replace: true });
-    } else {
-      const newErrorCount = errorCount + 1;
-      setErrorCount(newErrorCount);
-
-      if (newErrorCount >= 5) {
-        setLockUntil(Date.now() + 30 * 60 * 1000);
-        message.error('连续错误 5 次，账号锁定 30 分钟');
+    try {
+      if (await login(values.account.trim(), values.password)) {
+        message.success('登录成功');
+        navigate('/app/home/overview', { replace: true });
       } else {
-        message.error(`账号或密码错误，剩余 ${5 - newErrorCount} 次机会`);
+        message.error('账号或密码错误，请重新输入');
       }
-      generateCaptcha();
+    } catch {
+      message.error('登录失败，请稍后重试');
+    } finally {
+      setLoading(false);
     }
   };
+  const [method, setMethod] = useState('account');
+  const [resident, setResident] = useState('mainland');
+  const [notice, setNotice] = useState('');
 
-  const handlePhoneLogin: FormProps<PhoneLoginValues>['onFinish'] = async (values) => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
-    message.success('登录成功');
-    navigate('/app/home/overview', { replace: true });
-  };
-
-  const isLocked = lockUntil !== null && Date.now() < lockUntil;
-
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #6E0B10 0%, #A50D24 45%, #C8102E 100%)',
-        padding: '60px 24px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-      }}
-    >
-      <Card style={{ width: 440, borderRadius: 12 }} styles={{ body: { padding: 40 } }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <img
-            src="/gov-logo.svg"
-            alt="政务综合智能体"
-            style={{ width: 56, height: 56, marginBottom: 12 }}
-          />
-          <Title level={2} style={{ marginBottom: 8 }}>用户登录</Title>
-          <Text type="secondary">政务综合智能体</Text>
+  return <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #123D80 0%, #2468D8 45%, #4083E8 100%)', padding: '60px 24px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+    <Card style={{ width: 440, maxWidth: '100%', borderRadius: 12 }} styles={{ body: { padding: 40 } }}>
+      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <img src="/gov-logo.svg" alt="浦易达" style={{ width: 116, height: 56, marginBottom: 12 }} />
+        <Title level={2} style={{ marginBottom: 8 }}>用户登录</Title>
+        <Text type="secondary">浦易达</Text>
+        <div style={{ marginTop: 12 }}><a href="/website/pud">浦易达官网入口 →</a></div>
+      </div>
+      <Form form={form} layout="vertical" size="large" onFinish={handleLogin}>
+        <div className="login-official-fields">
+          <Tabs activeKey={method} onChange={setMethod} centered items={[{ key: 'qr', label: '扫码登录' }, { key: 'account', label: '账号密码登录' }]} />
+          {method === 'account' ? <>
+            <Form.Item name="account" rules={[{ required: true, whitespace: true, message: '请输入手机号码或证件号码' }]}>
+              <Input aria-label="个人账号" autoComplete="username" placeholder={resident === 'mainland' ? '手机号码 / 身份证号' : '注册账号 / 证件号码'} addonBefore={<Select aria-label="居民类型" value={resident} onChange={value => { setResident(value); form.resetFields(['account']); }} popupMatchSelectWidth={220} options={[{ value: 'mainland', label: '大陆居民' }, { value: 'other', label: '其他证件' }]} />} />
+            </Form.Item>
+            <Form.Item name="password" rules={[{ required: true, message: '请输入登录密码' }]}>
+              <Input.Password aria-label="登录密码" prefix={<LockOutlined />} autoComplete="current-password" placeholder="请输入登录密码" />
+            </Form.Item>
+            <div className="login-account-help"><button type="button" onClick={() => setNotice('注册账号')}>没有账号？去注册</button><button type="button" onClick={() => setNotice('找回密码')}>忘记密码？</button></div>
+          </> : <div className="login-scan-guide">
+            <QrcodeOutlined aria-hidden="true" />
+            <strong>使用随申办扫码登录</strong>
+            <p>前往一网通办官方认证页<br />使用随申办 App 或小程序扫码</p>
+          </div>}
+          <div className="login-other-methods"><span>其他快捷登录</span><Space wrap><button type="button" onClick={() => setNotice('国家政务服务平台登录')}><SafetyCertificateOutlined /> 国家政务服务平台</button><button type="button" onClick={() => setNotice('其他登录方式')}>其他方式 ›</button></Space></div>
         </div>
-
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          centered
-          items={[
-            {
-              key: 'account',
-              label: '账号密码登录',
-              children: (
-                <Form form={form} layout="vertical" onFinish={handleAccountLogin} size="large">
-                  <Form.Item
-                    name="account"
-                    rules={[{ required: true, message: '请输入账号' }]}
-                  >
-                    <Input prefix={<UserOutlined />} placeholder="工号 / 手机号 / 姓名" />
-                  </Form.Item>
-
-                  <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-                    <Input.Password prefix={<LockOutlined />} placeholder="请输入密码" />
-                  </Form.Item>
-
-                  {showCaptcha && (
-                    <Form.Item
-                      name="captcha"
-                      rules={[{ required: true, message: '请输入图形验证码' }]}
-                    >
-                      <Space.Compact style={{ width: '100%' }}>
-                        <Input
-                          placeholder="请输入图形验证码"
-                          maxLength={4}
-                          style={{ flex: 1 }}
-                        />
-                        <Button
-                          onClick={generateCaptcha}
-                          style={{ width: 100, height: 40, letterSpacing: 2 }}
-                        >
-                          {captcha}
-                        </Button>
-                      </Space.Compact>
-                    </Form.Item>
-                  )}
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
-                    <Checkbox>记住账号</Checkbox>
-                    <a style={{ fontSize: 14 }}>忘记密码？</a>
-                  </div>
-
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    block
-                    loading={loading}
-                    disabled={isLocked}
-                  >
-                    {isLocked ? `锁定中 ${lockRemaining}s` : '登录'}
-                  </Button>
-                </Form>
-              ),
-            },
-            {
-              key: 'phone',
-              label: '手机验证码登录',
-              children: (
-                <Form form={phoneForm} layout="vertical" onFinish={handlePhoneLogin} size="large">
-                  <Form.Item
-                    name="phone"
-                    rules={[
-                      { required: true, message: '请输入手机号' },
-                      { pattern: /^1[3-9]\d{9}$/, message: '手机号格式错误' },
-                    ]}
-                  >
-                    <Input prefix={<MobileOutlined />} placeholder="请输入手机号" />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="verificationCode"
-                    rules={[
-                      { required: true, message: '请输入验证码' },
-                      { pattern: /^\d{6}$/, message: '验证码为 6 位数字' },
-                    ]}
-                  >
-                    <Space.Compact style={{ width: '100%' }}>
-                      <Input
-                        placeholder="请输入 6 位验证码"
-                        maxLength={6}
-                        style={{ flex: 1 }}
-                      />
-                      <Button
-                        onClick={handleSendCode}
-                        disabled={countdown > 0}
-                        style={{ width: 110 }}
-                      >
-                        {countdown > 0 ? `${countdown}s` : '获取验证码'}
-                      </Button>
-                    </Space.Compact>
-                  </Form.Item>
-
-                  <div style={{ marginBottom: 24 }}>
-                    <Checkbox>自动登录</Checkbox>
-                  </div>
-
-                  <Button type="primary" htmlType="submit" block loading={loading}>
-                    登录
-                  </Button>
-                </Form>
-              ),
-            },
-          ]}
-        />
-
-        {errorCount >= 3 && errorCount < 5 && (
-          <div style={{ marginTop: 16, textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              连续错误 {errorCount} 次，请输入图形验证码
-            </Text>
-          </div>
-        )}
-      </Card>
-    </div>
-  );
-};
-
-export default Login;
+        <Button type="primary" block loading={loading} htmlType={method === 'account' ? 'submit' : 'button'} onClick={method === 'qr' ? () => setNotice('扫码登录') : undefined}>{method === 'account' ? '登录' : '前往扫码登录'}</Button>
+      </Form>
+    </Card>
+    <Modal title={notice} open={!!notice} onCancel={() => setNotice('')} footer={<><Button onClick={() => setNotice('')}>取消</Button><Button type="primary" href={OFFICIAL_LOGIN} target="_blank" rel="noopener noreferrer" onClick={() => { form.resetFields(['password']); setNotice(''); }}>打开官方认证页</Button></>}>
+      <p>将在新窗口打开上海一网通办官方认证页，请在官方页面完成{notice}。</p>
+      <Alert type="info" showIcon message="当前为演示环境，尚未接入统一身份认证回调。官网认证结果暂不能自动返回本工作台；本页输入的信息不会发送至官网。" />
+    </Modal>
+  </div>;
+}

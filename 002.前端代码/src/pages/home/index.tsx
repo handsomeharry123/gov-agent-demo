@@ -1,3 +1,7 @@
+import { archiveGeneratedFile } from './knowledgeFiles';
+import KnowledgeCenter from './KnowledgeCenter';
+import { PUDONG_BLUE } from '../../theme/brand';
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 /**
  * 招小慧智能体 · 首页 V1.0（PRD V1 落地版）
  *
@@ -15,7 +19,7 @@
  *     第二层「新建任务」点击 → 重置 messages 注入问候语 + 聚焦输入框。
  */
 import { type CSSProperties, type DragEvent, type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { buildPlatformReport, type ReportNode } from '../ledger/demo/reportData';
@@ -73,6 +77,7 @@ import ReactMarkdown from 'react-markdown';
 import WorkspacePicker from '../../components/WorkspacePicker';
 import { skillPromptExamples, type SkillItem, type SkillKey } from '../../mock/skills';
 import { useAuth } from '../../hooks/useAuth';
+import { useVoiceInputDemo } from '../../components/VoiceInputDemo';
 import { useDemoSettings } from '../../hooks/useDemoSettings';
 import {
   addApply,
@@ -582,7 +587,7 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-  const palette = ['#C8102E', '#13C2C2', '#52C41A', '#FA8C16', '#722ED1', '#EB2F96', '#FAAD14', '#A0D911'];
+  const palette = [PUDONG_BLUE, '#13C2C2', '#52C41A', '#FA8C16', '#722ED1', '#EB2F96', '#FAAD14', '#A0D911'];
   const renderKpis = (kpis: NonNullable<ReportNode['kpis']>) => `
     <div class="kpi-grid" style="grid-template-columns:repeat(${Math.min(kpis.length, 5)},1fr);">
       ${kpis
@@ -590,7 +595,7 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
           (k) => `
             <div class="kpi-card">
               <div class="kpi-label">${esc(k.label)}</div>
-              <div class="kpi-value" style="color:${esc(k.color || '#C8102E')}">${esc(k.value)}${
+              <div class="kpi-value" style="color:${esc(k.color || PUDONG_BLUE)}">${esc(k.value)}${
                 k.unit ? `<span>${esc(k.unit)}</span>` : ''
               }</div>
             </div>`,
@@ -701,7 +706,7 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
     <h2 class="section-title">一、${isHospitalScope ? '监控总体情况' : '科室监控总体情况'}</h2>
     <h3>（一）总体监控概览</h3>
     ${renderKpis([
-      { label: isHospitalScope ? '纳管智能体总数' : '科室纳管智能体', value: isHospitalScope ? '42' : '8', unit: '个', color: '#C8102E' },
+      { label: isHospitalScope ? '纳管智能体总数' : '科室纳管智能体', value: isHospitalScope ? '42' : '8', unit: '个', color: PUDONG_BLUE },
       { label: '累计调用次数', value: isHospitalScope ? '126.8' : '28.6', unit: '万', color: '#13C2C2' },
       { label: '任务执行成功率', value: isHospitalScope ? '96.8' : '96.2', unit: '%', color: '#52C41A' },
       { label: '智能体在线率', value: isHospitalScope ? '85.7' : '87.5', unit: '%', color: '#FA8C16' },
@@ -727,19 +732,19 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
     ${renderKpis([
       { label: '任务执行成功率', value: isHospitalScope ? '96.8' : '96.2', unit: '%', color: '#52C41A' },
       { label: '任务中断率', value: isHospitalScope ? '2.1' : '2.4', unit: '%', color: '#FA8C16' },
-      { label: '自助解决率', value: isHospitalScope ? '83.5' : '81.9', unit: '%', color: '#C8102E' },
+      { label: '自助解决率', value: isHospitalScope ? '83.5' : '81.9', unit: '%', color: PUDONG_BLUE },
     ])}
     <p class="para">图2-1 任务执行成功率与任务中断率月度趋势。统计周期内任务执行质量持续改善，中断任务主要集中于高峰时段接口超时场景。</p>
     <h3>（二）调用情况</h3>
     ${renderKpis([
-      { label: '累计调用次数', value: isHospitalScope ? '126.8' : '28.6', unit: '万次', color: '#C8102E' },
+      { label: '累计调用次数', value: isHospitalScope ? '126.8' : '28.6', unit: '万次', color: PUDONG_BLUE },
       { label: '当日调用次数', value: isHospitalScope ? '1.12' : '2560', unit: isHospitalScope ? '万次' : '次', color: '#13C2C2' },
       { label: isHospitalScope ? 'TOP10智能体调用占比' : 'TOP1智能体调用占比', value: isHospitalScope ? '71' : '43', unit: '%', color: '#722ED1' },
     ])}
     <p class="para">${isHospitalScope ? '图2-2 调用次数月度趋势（万次；平台支持日/周/月粒度切换）。调用量持续攀升，需同步关注高峰时段资源保障。' : '图2-2 科室调用次数月度趋势；图2-3 科室各智能体日均调用次数排行。影像报告解读助手日均调用1120次、居科室首位。'}</p>
     <h3>（三）响应性能</h3>
     ${renderKpis([
-      { label: '平均响应时间', value: isHospitalScope ? '1.7' : '1.8', unit: '秒', color: '#C8102E' },
+      { label: '平均响应时间', value: isHospitalScope ? '1.7' : '1.8', unit: '秒', color: PUDONG_BLUE },
       { label: '响应时间P95', value: isHospitalScope ? '4.0' : '4.1', unit: '秒', color: '#13C2C2' },
       { label: '响应时间P99', value: '6.2', unit: '秒', color: '#FA8C16' },
       { label: '响应超时率', value: isHospitalScope ? '0.9' : '1.1', unit: '%', color: '#F5222D' },
@@ -754,7 +759,7 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
     <h3>（一）${isHospitalScope ? '实时在线/离线情况' : '实时运行状态'}</h3>
     ${renderKpis([
       { label: isHospitalScope ? '实时在线智能体数量' : '实时在线', value: isHospitalScope ? '36' : '7', unit: '个', color: '#52C41A' },
-      { label: '在线率', value: isHospitalScope ? '85.7' : '87.5', unit: '%', color: '#C8102E' },
+      { label: '在线率', value: isHospitalScope ? '85.7' : '87.5', unit: '%', color: PUDONG_BLUE },
       { label: isHospitalScope ? '实时离线智能体数量' : '实时离线', value: isHospitalScope ? '2' : '0', unit: '个', color: '#FA8C16' },
       { label: isHospitalScope ? '累计异常智能体' : '当前异常', value: isHospitalScope ? '4' : '1', unit: '个', color: '#F5222D' },
     ])}
@@ -773,7 +778,7 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
     <h2 class="section-title">四、成本监控情况</h2>
     <h3>（一）单位成本情况</h3>
     ${renderKpis([
-      { label: '单次会话平均成本', value: isHospitalScope ? '0.31' : '0.29', unit: '元', color: '#C8102E' },
+      { label: '单次会话平均成本', value: isHospitalScope ? '0.31' : '0.29', unit: '元', color: PUDONG_BLUE },
       { label: '单任务平均成本', value: isHospitalScope ? '0.42' : '0.38', unit: '元', color: '#13C2C2' },
       { label: '使用成本合计', value: isHospitalScope ? '38.6' : '8.2', unit: '万元', color: '#FA8C16' },
     ])}
@@ -810,7 +815,7 @@ async function exportLedgerReportPdf(reportCard: LedgerReportCard) {
     ${renderKpis([
       { label: '告警次数', value: isHospitalScope ? '68' : '14', unit: '次', color: '#FA8C16' },
       { label: '故障次数', value: isHospitalScope ? '3' : '1', unit: '次', color: '#F5222D' },
-      { label: '故障平均恢复时间', value: isHospitalScope ? '42' : '35', unit: '分钟', color: '#C8102E' },
+      { label: '故障平均恢复时间', value: isHospitalScope ? '42' : '35', unit: '分钟', color: PUDONG_BLUE },
     ])}
     <h3>（二）${isHospitalScope ? '告警原因分析' : '典型问题及处理方案'}</h3>
     ${renderTable({
@@ -1358,8 +1363,8 @@ const monitorRecommendedQuestions = [
 /* =========================================================
  * 主页组件
  * ========================================================= */
-const HomePage = () => {
-  const navigate = useNavigate();
+const HomePage = ({ embedded = false, chatOnly = false, initialAssistantMessage, answerQuestion }: { embedded?: boolean; chatOnly?: boolean; initialAssistantMessage?: string; answerQuestion?: (question: string) => string }) => {
+  const navigate = useWorkspaceNavigate();
   const location = useLocation();
   const { currentUser } = useAuth();
   const { demoRole } = useDemoSettings();
@@ -1393,7 +1398,8 @@ const HomePage = () => {
     time: string;
   };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState(() => (location.state as { portalPrompt?: string } | null)?.portalPrompt ?? '');
+  const { listening: voiceListening, voiceStatus, toggleVoice, voiceOverlay } = useVoiceInputDemo(draft, setDraft);
   const [selectedSkillTags, setSelectedSkillTags] = useState<string[]>([]);
   const [model, setModel] = useState('auto');
   const [loading, setLoading] = useState(false);
@@ -1413,9 +1419,10 @@ const HomePage = () => {
   const [accessAuditFlow, setAccessAuditFlow] = useState<AccessAuditFlow | null>(null);
   /** 是否处于「新建任务」视图;切换到历史会话 / 自动化执行记录后置 false,场景标签随之隐藏 */
   const [isNewTaskView, setIsNewTaskView] = useState(true);
-  const [governmentScene, setGovernmentScene] = useState<GovernmentSceneKey | null>(null);
+  const [governmentScene, setGovernmentScene] = useState<GovernmentSceneKey | null>(() => { const scene = (location.state as { portalScene?: string } | null)?.portalScene; return scene && isGovernmentScene(scene) ? scene : null; });
   const [selectedAgent, setSelectedAgent] = useState<AgentKey>('general');
   const [mobileMineOpen, setMobileMineOpen] = useState(false);
+  const mobileAiOpen = location.pathname.endsWith('/ai');
   const activeAgent = agents.find(a => a.key === selectedAgent)!;
   const agentConversations = useRef<Partial<Record<AgentKey, () => void>>>({});
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -1435,11 +1442,11 @@ const HomePage = () => {
   /* 首页中间内容区 slot:'overview' 显示招小慧对话;'connector' 显示连接器列表;'skill' 显示技能列表;'skill-manage' 显示技能管理;'auto-tasks' 显示自动化任务列表 */
   const requestedMiddleView = (
     location.state as {
-      middleView?: 'overview' | 'connector' | 'skill' | 'skill-manage' | 'auto-tasks';
+      middleView?: 'overview' | 'connector' | 'skill' | 'skill-manage' | 'auto-tasks' | 'knowledge';
     } | null
   )?.middleView;
-  const routeMiddleView: 'connector' | 'skill' | 'skill-manage' | 'auto-tasks' | undefined =
-    location.pathname.endsWith('/connector')
+  const routeMiddleView: 'connector' | 'skill' | 'skill-manage' | 'auto-tasks' | 'knowledge' | undefined =
+    location.pathname.endsWith('/knowledge') ? 'knowledge' : location.pathname.endsWith('/connector')
       ? 'connector'
       : location.pathname.endsWith('/skill/manage')
         ? 'skill-manage'
@@ -1448,14 +1455,14 @@ const HomePage = () => {
       : location.pathname.endsWith('/auto-tasks')
         ? 'auto-tasks'
         : undefined;
-  const [middleView, setMiddleView] = useState<'overview' | 'connector' | 'skill' | 'skill-manage' | 'auto-tasks'>(
-    requestedMiddleView ?? routeMiddleView ?? 'overview',
+  const [middleView, setMiddleView] = useState<'overview' | 'connector' | 'skill' | 'skill-manage' | 'auto-tasks' | 'knowledge'>(
+    (requestedMiddleView === 'connector' || requestedMiddleView === 'auto-tasks' ? 'overview' : requestedMiddleView) ?? routeMiddleView ?? 'overview',
   );
   useEffect(() => {
     if (routeMiddleView) {
       setMiddleView(routeMiddleView);
     } else if (location.pathname.endsWith('/overview')) {
-      setMiddleView(requestedMiddleView ?? 'overview');
+      setMiddleView(requestedMiddleView === 'connector' || requestedMiddleView === 'auto-tasks' ? 'overview' : requestedMiddleView ?? 'overview');
     }
   }, [location.pathname, requestedMiddleView, routeMiddleView]);
   const [autoTasks, setAutoTasks] = useState<AutoTask[]>(() =>
@@ -1544,8 +1551,15 @@ const HomePage = () => {
     };
   }, [isNewTaskView, isItAdmin, updateSceneTagScrollState]);
 
+  const portalRequestHandled = useRef(false);
+
   // 角色变化/首次进入 → 注入问候语
   useEffect(() => {
+    if (chatOnly) {
+      setMessages([{ id: `drawer-welcome`, role: 'assistant', content: initialAssistantMessage || '您好，我是招小慧。请告诉我您的政策咨询需求。', time: nowStr() }]);
+      return;
+    }
+    if (embedded && portalRequestHandled.current) return;
     setMessages([
       {
         id: `a-${Date.now()}`,
@@ -1720,6 +1734,13 @@ const HomePage = () => {
     setEvaluationAuditFlow(null);
     setMonitorFlow(null);
     setAccessAuditFlow(null);
+  }, []);
+
+  const handleOpenKnowledge = useCallback(() => {
+    setGovernmentScene(null);
+    setActiveSessionId(null);
+    setMobileMineOpen(false);
+    setMiddleView('knowledge');
   }, []);
 
   /* 与连接器一致，重复点击仍保持技能列表。 */
@@ -3064,7 +3085,7 @@ ${ACCESS_SCENE.closing}`,
   // 新消息自动滚动到底
   useEffect(() => {
     const el = messageListRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el) el.scrollTop = chatOnly && messages.length === 1 ? 0 : el.scrollHeight;
   }, [messages, loading]);
 
   /* ---------- 事件:发送 / 停止 ---------- */
@@ -3072,6 +3093,11 @@ ${ACCESS_SCENE.closing}`,
     const selectedSkillText = selectedSkillTags.map((name) => `#${name}`).join(' ');
     const text = (overrideText ?? [selectedSkillText, draft].filter(Boolean).join(' ')).trim();
     if (!text || loading) return;
+    if (answerQuestion) {
+      const stamp = Date.now();
+      setMessages(previous => [...previous, { id: `drawer-u-${stamp}`, role: 'user', content: text, time: nowStr() }, { id: `drawer-a-${stamp}`, role: 'assistant', content: answerQuestion(text), time: nowStr() }]);
+      setDraft(''); setSelectedSkillTags([]); return;
+    }
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
       role: 'user',
@@ -3083,7 +3109,12 @@ ${ACCESS_SCENE.closing}`,
 
     if (selectedAgent === 'industry') {
       setIsNewTaskView(false);
-      setMessages(prev=>[...prev,userMsg,{id:`industry-${Date.now()}`,role:'assistant',content:'### 产业链分析（演示）\n\n已读取产业链图谱 → 联动企业库 → 识别薄弱环节 → 形成补链建议。\n\n新能源汽车样例：电池材料12家，电池结构件2家，BMS 5家，电机电控8家，整车制造1家，充换电设备3家。建议优先核验电池结构件与整车缺口，重点强链BMS和充换电设备。\n\n来源：浦东新能源汽车零部件产业链企业名录（2026年10月）。目标企业扩产信号、名单和投资意愿仍需核验。其他产业请补充产业链数据后分析。',time:nowStr()}]);
+      const industryContent = '### 产业链分析（演示）\n\n已读取产业链图谱 → 联动企业库 → 识别薄弱环节 → 形成补链建议。\n\n新能源汽车样例：电池材料12家，电池结构件2家，BMS 5家，电机电控8家，整车制造1家，充换电设备3家。建议优先核验电池结构件与整车缺口，重点强链BMS和充换电设备。\n\n来源：浦东新能源汽车零部件产业链企业名录（2026年10月）。目标企业扩产信号、名单和投资意愿仍需核验。其他产业请补充产业链数据后分析。';
+      if (currentUser) {
+        try { archiveGeneratedFile(currentUser.id, currentUser.name, "浦东新能源汽车产业链分析", industryContent); }
+        catch { message.warning("成果已生成，但本地归档失败，请及时保存"); }
+      }
+      setMessages(prev=>[...prev,userMsg,{id:`industry-${Date.now()}`,role:'assistant',content:industryContent,time:nowStr()}]);
       return;
     }
     const detectedGovernmentScene = governmentScene ?? activeAgent.scene ?? ( /招商方案|一企一策|精密结构件/.test(text) ? 'gov-plan' : /空间|入驻|整层/.test(text) ? 'gov-space' : /政策|高新技术|研发投入/.test(text) ? 'gov-policy' : /研判|半导体封测/.test(text) ? 'gov-review' : null);
@@ -3098,6 +3129,10 @@ ${ACCESS_SCENE.closing}`,
       setMiddleView('overview');
       setIsNewTaskView(false);
       const content = governmentReply(detectedGovernmentScene, text);
+      if (currentUser) {
+        try { archiveGeneratedFile(currentUser.id, currentUser.name, scene.label, content); }
+        catch { message.warning('成果已生成，但本地归档失败，请及时导出保存'); }
+      }
       setMessages(prev => [...prev, userMsg, {id:`gov-a-${Date.now()}`, role:'assistant', content, governmentScene:detectedGovernmentScene, quickActions:scene.actions.filter(a => /材料|楼层|注册地/.test(a)), time:nowStr()}]);
       return;
     }
@@ -3894,10 +3929,26 @@ ${ACCESS_SCENE.closing}`,
     }, 1200);
   };
 
+  useEffect(() => {
+    const request = location.state as { portalPrompt?: string; portalScene?: string; fromPortal?: boolean } | null;
+    const scene = embedded && request?.fromPortal
+      ? governmentScenarios.find(item => item.key === request.portalScene)
+      : undefined;
+    const prompt = request?.portalPrompt;
+    if ((!scene && !prompt) || portalRequestHandled.current) return;
+    portalRequestHandled.current = true;
+    if (scene) {
+      handleSceneTagClick({ key: scene.key, label: scene.label, prompt: scene.example, icon: null });
+    } else if (prompt) {
+      handleSend(prompt);
+    }
+    navigate(location.pathname, { replace: true, state: { fromPortal: true } });
+  }, []);
+
   const handleStop = () => setLoading(false);
 
   /* ---------- 数据 ---------- */
-  // 场景标签:点击后将该场景的 prompt 作为问句发送
+  // 政务场景由助手主动引导，示例由用户确认后发送。
   const handleSceneTagClick = (tag: SceneTag) => {
     if (isGovernmentScene(tag.key)) {
       handleNewTask();
@@ -3958,12 +4009,12 @@ ${ACCESS_SCENE.closing}`,
    * ========================================================= */
   return (
     <div
-      className={`home-v1-root mobile-tabs-layout ${mobileMineOpen ? 'is-mine-open' : ''}`}
+      className={`home-v1-root mobile-tabs-layout ${chatOnly ? 'is-chat-only' : ''} ${mobileMineOpen ? 'is-mine-open' : ''} ${!embedded && !mobileAiOpen && !mobileMineOpen && selectedAgent === 'general' && middleView === 'overview' ? 'is-mobile-home' : ''}`}
       data-testid="home-v1"
       style={{
         padding: 16,
         background: '#F5F7FA',
-        height: 'calc(100dvh - 64px)',
+        height: embedded ? '100%' : 'calc(100dvh - 64px)',
         minHeight: 0,
         boxSizing: 'border-box',
         display: 'flex',
@@ -3986,7 +4037,7 @@ ${ACCESS_SCENE.closing}`,
         >
           <HomeSidebarV2
             initialActiveKey={
-              middleView === 'connector'
+              middleView === 'knowledge' ? 'knowledge' : middleView === 'connector'
                 ? 'connector'
                 : middleView === 'skill' || middleView === 'skill-manage'
                   ? 'skill'
@@ -3999,6 +4050,7 @@ ${ACCESS_SCENE.closing}`,
             onRestoreRun={handleRestoreRun}
             onAutoTaskCreated={handleAutoTaskCreated}
             onOpenConnector={handleOpenConnector}
+            onOpenKnowledge={handleOpenKnowledge}
             onOpenSkill={handleOpenSkill}
             onOpenAutoTasks={handleOpenAutoTasks}
             autoTasks={autoTasks}
@@ -4025,7 +4077,7 @@ ${ACCESS_SCENE.closing}`,
                 工作台
               </Button>
               <div className="home-v1-context-location" aria-live="polite">
-                {middleView === 'overview' ? <><span className="mobile-agent-static-name">{selectedAgent === 'general' ? '招小慧 · 综合助手' : activeAgent.name}</span><span className="mobile-agent-legacy-switch"><AgentSwitcher value={selectedAgent} onChange={switchAgent} compact /></span></> : <strong>{middleView === 'connector' ? '连接器' : middleView === 'skill-manage' ? '我安装的技能' : middleView === 'skill' ? '技能中心' : '自动化任务'}</strong>}
+                {middleView === 'overview' ? <><span className="mobile-agent-static-name">{selectedAgent === 'general' ? '招小慧 · 综合助手' : activeAgent.name}</span><span className="mobile-agent-legacy-switch"><AgentSwitcher value={selectedAgent} onChange={switchAgent} compact /></span></> : <strong>{middleView === 'knowledge' ? '知识中心' : middleView === 'connector' ? '连接器' : middleView === 'skill-manage' ? '我安装的技能' : middleView === 'skill' ? '技能中心' : '自动化任务'}</strong>}
               </div>
               <Button
                 className="home-v1-function-nav-item"
@@ -4033,9 +4085,9 @@ ${ACCESS_SCENE.closing}`,
                 icon={<PlusOutlined />}
                 onClick={handleNewTask}
                 data-testid="home-v1-narrow-new"
-                aria-label="新建任务"
+                aria-label="新对话"
               >
-                新建
+                新对话
               </Button>
             </div>
           </div>
@@ -4052,7 +4104,7 @@ ${ACCESS_SCENE.closing}`,
           >
             <HomeSidebarV2
               initialActiveKey={
-                middleView === 'connector'
+                middleView === 'knowledge' ? 'knowledge' : middleView === 'connector'
                   ? 'connector'
                   : middleView === 'skill' || middleView === 'skill-manage'
                     ? 'skill'
@@ -4065,6 +4117,7 @@ ${ACCESS_SCENE.closing}`,
               onRestoreRun={(id) => { handleRestoreRun(id); setMobileNavOpen(false); }}
               onAutoTaskCreated={handleAutoTaskCreated}
               onOpenConnector={() => { handleOpenConnector(); setMobileNavOpen(false); }}
+              onOpenKnowledge={() => { handleOpenKnowledge(); setMobileNavOpen(false); }}
               onOpenSkill={() => { handleOpenSkill(); setMobileNavOpen(false); }}
               onOpenAutoTasks={() => { handleOpenAutoTasks(); setMobileNavOpen(false); }}
               autoTasks={autoTasks}
@@ -4097,7 +4150,9 @@ ${ACCESS_SCENE.closing}`,
             }}
             style={{ height: '100%' }}
           >
-        {middleView === 'connector' ? (
+        {middleView === 'knowledge' ? (
+          <KnowledgeCenter onAsk={(prompt) => { handleNewTask(); setDraft(prompt); }} />
+        ) : middleView === 'connector' ? (
           <div style={{ height: '100%', overflow: 'auto' }} data-testid="home-v1-middle-connector">
             {/* 内嵌连接器列表（隐藏副标题 + 演示态 Segmented）。 */}
             <ConnectorList embedded />
@@ -4278,8 +4333,8 @@ ${ACCESS_SCENE.closing}`,
                       transition: 'all 0.15s',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#C8102E';
-                      e.currentTarget.style.color = '#C8102E';
+                      e.currentTarget.style.borderColor = PUDONG_BLUE;
+                      e.currentTarget.style.color = PUDONG_BLUE;
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = '#D9D9D9';
@@ -4319,11 +4374,11 @@ ${ACCESS_SCENE.closing}`,
             onDragLeave={handleInputDragLeave}
             onDrop={handleInputDrop}
             style={{
-              border: `1px solid ${isInputDragOver ? '#C8102E' : '#D9D9D9'}`,
+              border: `1px solid ${isInputDragOver ? PUDONG_BLUE : '#D9D9D9'}`,
               borderRadius: 10,
               padding: '6px 10px',
               background: isInputDragOver ? '#FFF1F0' : '#FFFFFF',
-              boxShadow: isInputDragOver ? '0 0 0 3px rgba(200, 16, 46, 0.12)' : 'none',
+              boxShadow: isInputDragOver ? '0 0 0 3px rgba(36, 104, 216, 0.12)' : 'none',
               transition: 'border-color 0.15s, box-shadow 0.15s, background 0.15s',
             }}
           >
@@ -4331,7 +4386,7 @@ ${ACCESS_SCENE.closing}`,
               <div
                 style={{
                   marginBottom: 4,
-                  color: '#C8102E',
+                  color: PUDONG_BLUE,
                   fontSize: 12,
                   fontWeight: 600,
                 }}
@@ -4393,6 +4448,7 @@ ${ACCESS_SCENE.closing}`,
               ))}
               <TextArea
                 value={draft}
+                readOnly={voiceListening}
                 onChange={(e) => setDraft(e.target.value)}
                 onDragEnter={handleInputDragOver}
                 onDragOver={handleInputDragOver}
@@ -4463,11 +4519,7 @@ ${ACCESS_SCENE.closing}`,
                         label: '技能选择',
                         icon: <ToolOutlined />,
                       },
-                      {
-                        key: 'connector',
-                        label: '连接器',
-                        icon: <ApiOutlined />,
-                      },
+
                     ],
                     onClick: ({ key }) => {
                       if (key === 'file') {
@@ -4495,20 +4547,16 @@ ${ACCESS_SCENE.closing}`,
               <span style={{ flex: 1 }} />
               {/* 右侧:模型 + 语音 + 发送 */}
               <Space size={4}>
-                <ModelSelector
-                  size="small"
-                  variant="borderless"
-                  compact
-                  value={model}
-                  onChange={setModel}
-                  style={{ width: 104, fontSize: 12 }}
-                  testId="home-model-selector"
-                />
-                <Tooltip title="语音输入">
+
+                {voiceOverlay}
+                <Tooltip title={voiceStatus || "语音输入"} open={voiceListening ? false : undefined}>
                   <Button
                     type="text"
                     shape="circle"
-                    icon={<AudioOutlined style={{ fontSize: 17 }} />}
+                    icon={voiceListening ? <StopOutlined style={{ fontSize: 17 }} /> : <AudioOutlined style={{ fontSize: 17 }} />}
+                    onClick={toggleVoice}
+                    aria-label={voiceListening ? "停止语音输入" : "开始语音输入"}
+                    aria-pressed={voiceListening}
                     style={{ width: 32, height: 32, color: '#262626' }}
                     data-testid="home-v1-toolbar-voice"
                   />
@@ -4533,14 +4581,14 @@ ${ACCESS_SCENE.closing}`,
                     shape="circle"
                     icon={<ArrowUpOutlined style={{ fontSize: 16, fontWeight: 600 }} />}
                     onClick={() => handleSend()}
-                    disabled={!draft.trim() && selectedSkillTags.length === 0}
+                    disabled={voiceListening || (!draft.trim() && selectedSkillTags.length === 0)}
                     aria-label="发送消息"
                     style={{
                       width: 34,
                       height: 34,
                       border: 0,
                       boxShadow: 'none',
-                      background: draft.trim() || selectedSkillTags.length > 0 ? '#C8102E' : '#D9D9D9',
+                      background: draft.trim() || selectedSkillTags.length > 0 ? PUDONG_BLUE : '#D9D9D9',
                       color: '#FFFFFF',
                     }}
                     data-testid="home-v1-send"
@@ -4549,7 +4597,7 @@ ${ACCESS_SCENE.closing}`,
               </Space>
             </div>
           </div>
-          <WorkspacePicker />
+
         </div>
           </>
         )}
@@ -4557,20 +4605,34 @@ ${ACCESS_SCENE.closing}`,
         </Col>
       </Row>
 
+      <section className="mobile-home-placeholder" aria-label="首页工作台">
+        <div className="mobile-home-eyebrow">GOVERNMENT SERVICES</div>
+        <h1>政务服务，一站协同</h1>
+        <div className="mobile-home-preview">
+          <span className="mobile-preview-badge">首页预览</span>
+          <div className="mobile-preview-symbol" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m4 10 8-6 8 6M6 9v11h12V9M10 20v-6h4v6" /></svg>
+          </div>
+          <h2>您的政务服务工作台</h2>
+          <div className="mobile-preview-skeleton" aria-hidden="true"><i/><i/><i/></div>
+        </div>
+      </section>
       <section className="mobile-mine-page" aria-label="我的">
         <div className="mobile-mine-profile"><Avatar size={48} icon={<UserOutlined />} /><div><h2>{currentUser?.name ?? '用户'}</h2><p>我的工作与服务</p></div></div>
         <div className="mobile-mine-links">
-          <button onClick={()=>{setMobileMineOpen(false);setMobileNavOpen(true);}}><SearchOutlined/><span>历史会话与任务</span><RightOutlined/></button>
+          <button onClick={()=>{setMobileMineOpen(false);setMobileNavOpen(true);}}><SearchOutlined/><span>历史会话</span><RightOutlined/></button>
           <button onClick={()=>{setMobileMineOpen(false);handleOpenSkill();}}><ToolOutlined/><span>技能中心</span><RightOutlined/></button>
-          <button onClick={()=>{setMobileMineOpen(false);handleOpenConnector();}}><ApiOutlined/><span>连接器管理</span><RightOutlined/></button>
-          <button onClick={()=>{setMobileMineOpen(false);handleOpenAutoTasks();}}><ThunderboltOutlined/><span>自动化任务与运行记录</span><RightOutlined/></button>
+          <button onClick={handleOpenKnowledge}><FileTextOutlined/><span>知识中心</span><RightOutlined/></button>
         </div>
         <p className="mobile-mine-hint">账户设置、切换 PC 端与退出登录，请点击右上角头像。</p>
       </section>
       <nav className="mobile-bottom-tabs" aria-label="移动端主导航">
-        {agents.map((agent,index)=><button key={agent.key} aria-current={!mobileMineOpen && middleView==='overview' && selectedAgent===agent.key ? 'page' : undefined} onClick={()=>{if(loading && selectedAgent!==agent.key){message.info('请停止生成或等待回复完成后切换');return;}setMobileMineOpen(false);setMobileNavOpen(false);setMiddleView('overview');switchAgent(agent.key);}}>
-          <span className="mobile-tab-icon">{index===0?<HomeOutlined/>:agent.icon}</span><span>{index===0?'首页':agent.name.replace('智能体','')}</span>
-        </button>)}
+        {agents.flatMap((agent,index)=>[
+          ...(index===3 ? [<button key="ai-entry" className="mobile-ai-entry" aria-label="打开 AI 对话" aria-current={mobileAiOpen && !mobileMineOpen ? 'page' : undefined} onClick={()=>{setMobileMineOpen(false);setMobileNavOpen(false);setMiddleView('overview');navigate('/app/home/ai');}}><span className="mobile-ai-orb"><span>AI</span><i/></span><span className="mobile-ai-label">招小慧</span></button>] : []),
+          <button key={agent.key} aria-current={!mobileAiOpen && !mobileMineOpen && middleView==='overview' && selectedAgent===agent.key ? 'page' : undefined} onClick={()=>{if(loading && selectedAgent!==agent.key){message.info('请停止生成或等待回复完成后切换');return;}setMobileMineOpen(false);setMobileNavOpen(false);setMiddleView('overview');switchAgent(agent.key);navigate('/app/home/overview');}}>
+            <span className="mobile-tab-icon">{index===0?<HomeOutlined/>:agent.icon}</span><span>{index===0?'首页':agent.name.replace('智能体','')}</span>
+          </button>
+        ])}
         <button aria-current={mobileMineOpen || middleView!=='overview' ? 'page' : undefined} onClick={()=>{setMobileNavOpen(false);setMobileMineOpen(true);}}><span className="mobile-tab-icon"><UserOutlined/></span><span>我的</span></button>
       </nav>
 
@@ -4673,7 +4735,7 @@ const MessageBubble = ({
       }}
     >
       {isUser ? (
-        <Avatar size={28} style={{ background: '#C8102E', flexShrink: 0 }} icon={<UserOutlined />} />
+        <Avatar size={28} style={{ background: PUDONG_BLUE, flexShrink: 0 }} icon={<UserOutlined />} />
       ) : (
         <AgentRobotIcon mood="happy" size={28} />
       )}
@@ -4693,7 +4755,7 @@ const MessageBubble = ({
         <div
           className={msg.governmentScene ? 'home-v1-message-content gov-scenario-result' : 'home-v1-message-content'}
           style={{
-            background: isUser ? '#C8102E' : '#FFFFFF',
+            background: isUser ? PUDONG_BLUE : '#FFFFFF',
             color: isUser ? '#fff' : '#333',
             border: isUser ? 'none' : '1px solid #E5E7EB',
             borderRadius: 8,
@@ -4776,7 +4838,7 @@ const MessageBubble = ({
                           padding: 0,
                           margin: 0,
                           background: 'transparent',
-                          color: '#C8102E',
+                          color: PUDONG_BLUE,
                           fontWeight: 600,
                           cursor: 'pointer',
                           textDecoration: 'underline',
@@ -4830,7 +4892,7 @@ const MessageBubble = ({
               }}
               data-testid="home-v1-ledger-report-card"
             >
-              <div style={{ fontWeight: 600, color: '#C8102E', marginBottom: 4 }}>
+              <div style={{ fontWeight: 600, color: PUDONG_BLUE, marginBottom: 4 }}>
                 {msg.reportCard.title}
               </div>
               <Space size={6} wrap>
@@ -4895,7 +4957,7 @@ const MessageBubble = ({
               <Button
                 type="link"
                 size="small"
-                style={{ padding: 0, color: isUser ? '#fff' : '#C8102E' }}
+                style={{ padding: 0, color: isUser ? '#fff' : PUDONG_BLUE }}
                 onClick={() => {
                   if (msg.link!.newTab) {
                     const url = new URL(msg.link!.to, window.location.origin);
@@ -6513,7 +6575,7 @@ function buildHomeDashboardMetrics(_role: '信息科管理员' | '科室管理�
         "period": "实时",
         "trend": [11720, 11890, 11820, 12140, 12260, 12210, 12510, 12620, 12847],
         "trendPeriod": "近30日",
-        "accent": "#B54863",
+        "accent": "#2468D8",
         "fill": "rgba(181, 72, 99, 0.085)"
     },
     {

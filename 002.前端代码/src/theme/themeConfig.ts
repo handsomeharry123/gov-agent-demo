@@ -1,3 +1,4 @@
+import { governmentBlue } from './brand';
 import { theme as antdTheme, type ThemeConfig } from 'antd';
 
 /** 主题风格标识：简约风（默认，浅色）/ 科技风（深色霓虹） */
@@ -23,18 +24,18 @@ const sharedToken: ThemeConfig['token'] = {
   wireframe: false,
 };
 
-/** 简约风：浅色政务红主题（默认） */
+/** 简约风：浅色浦易达政务蓝主题（默认） */
 export const simpleTheme: ThemeConfig = {
   token: {
     ...sharedToken,
-    // Brand colors —— 政务红主色
-    colorPrimary: '#D45B70',
+    // Brand colors —— 浦易达政务蓝主色
+    colorPrimary: governmentBlue.primary,
     colorSuccess: '#52C41A',
     colorWarning: '#FAAD14',
     colorError: '#FF4D4F',
-    colorInfo: '#D45B70',
-    colorLink: '#C84D65',
-    colorLinkHover: '#B73E56',
+    colorInfo: governmentBlue.primary,
+    colorLink: governmentBlue.primary,
+    colorLinkHover: governmentBlue.active,
     // Neutral colors
     colorTextBase: '#202936',
     colorBgBase: '#FFFFFF',
@@ -47,7 +48,7 @@ export const techTheme: ThemeConfig = {
   algorithm: antdTheme.darkAlgorithm,
   token: {
     ...sharedToken,
-    // Brand colors —— 政务红主色（深色底霓虹红）
+    // Brand colors —— 浦易达政务蓝主色（深色底霓虹红）
     colorPrimary: '#e03c4b',
     colorSuccess: '#34d399',
     colorWarning: '#fbbf24',

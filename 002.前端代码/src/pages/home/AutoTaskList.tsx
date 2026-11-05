@@ -1,3 +1,5 @@
+import { PUDONG_BLUE } from '../../theme/brand';
+import { useWorkspaceNavigate } from '../../hooks/useWorkspaceNavigate';
 /**
  * 首页 V1.x · 自动化任务列表子页(/app/home/auto-tasks)
  *
@@ -13,7 +15,6 @@
  *   - 返回 → navigate(-1) 保留上下文
  */
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeftOutlined,
   CaretRightOutlined,
@@ -88,7 +89,7 @@ const AutoTaskList = ({
   tasks: controlledTasks,
   onTasksChange,
 }: AutoTaskListProps = {}) => {
-  const navigate = useNavigate();
+  const navigate = useWorkspaceNavigate();
   const { message } = App.useApp();
 
   /* 数据 state:复制 initialAutoTasks 一份,避免污染 mock */
@@ -370,7 +371,7 @@ const AutoTaskList = ({
                   <FilterOutlined
                     style={{
                       fontSize: 20,
-                      color: runFilter === 'all' ? '#595959' : '#C8102E',
+                      color: runFilter === 'all' ? '#595959' : PUDONG_BLUE,
                     }}
                   />
                 }
@@ -552,7 +553,7 @@ const RunRecordList = ({
   onDelete: (runId: string) => void;
   compact: boolean;
 }) => {
-  const navigate = useNavigate();
+  const navigate = useWorkspaceNavigate();
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
   const groups = [
     {
